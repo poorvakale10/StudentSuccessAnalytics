@@ -1,0 +1,12 @@
+Classification Report - Decision Tree (Default)
+============================================================
+
+              precision    recall  f1-score   support
+
+     Dropout     0.7529    0.6866    0.7182       284
+    Enrolled     0.3596    0.2579    0.3004       159
+    Graduate     0.7598    0.8801    0.8155       442
+
+    accuracy                         0.7062       885
+   macro avg     0.6241    0.6082    0.6114       885
+weighted avg     0.6857    0.7062    0.6917       885

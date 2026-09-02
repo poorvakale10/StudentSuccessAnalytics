@@ -1,0 +1,12 @@
+Classification Report - Logistic Regression (Balanced)
+============================================================
+
+              precision    recall  f1-score   support
+
+     Dropout     0.7769    0.6866    0.7290       284
+    Enrolled     0.3906    0.5723    0.4643       159
+    Graduate     0.8379    0.7602    0.7972       442
+
+    accuracy                         0.7028       885
+   macro avg     0.6685    0.6730    0.6635       885
+weighted avg     0.7380    0.7028    0.7155       885

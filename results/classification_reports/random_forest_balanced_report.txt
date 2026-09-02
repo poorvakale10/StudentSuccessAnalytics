@@ -1,0 +1,12 @@
+Classification Report - Random Forest (Balanced)
+============================================================
+
+              precision    recall  f1-score   support
+
+     Dropout     0.7984    0.6972    0.7444       284
+    Enrolled     0.4394    0.5472    0.4874       159
+    Graduate     0.8405    0.8348    0.8377       442
+
+    accuracy                         0.7390       885
+   macro avg     0.6928    0.6931    0.6898       885
+weighted avg     0.7549    0.7390    0.7448       885
