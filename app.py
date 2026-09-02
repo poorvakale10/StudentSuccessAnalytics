@@ -153,34 +153,46 @@ st.markdown("""
         border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
     }
     
-    /* Styled Radio Navigation Buttons in Sidebar */
+    /* -------------------------------------------------------------------------- */
+    /* HIDE UGLY RADIO CIRCLES COMPLETELY & STYLE AS REAL WEBSITE NAVIGATION ITEMS */
+    /* -------------------------------------------------------------------------- */
+    div[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child {
+        display: none !important;
+    }
+    div[data-testid="stSidebar"] div[role="radiogroup"] label div[data-testid="stRadioButtonCustomIcon"] {
+        display: none !important;
+    }
+    div[data-testid="stSidebar"] div[role="radiogroup"] label input[type="radio"] {
+        display: none !important;
+    }
+    
+    /* Sleek Navigation Links */
     div[data-testid="stSidebar"] div[role="radiogroup"] {
-        gap: 0.5rem;
+        gap: 0.4rem !important;
     }
     div[data-testid="stSidebar"] div[role="radiogroup"] > label {
-        background: rgba(30, 41, 59, 0.5) !important;
+        background: transparent !important;
         border-radius: 8px !important;
-        padding: 0.65rem 1rem !important;
-        border: 1px solid rgba(255, 255, 255, 0.05) !important;
-        color: #CBD5E1 !important;
-        transition: all 0.2s ease !important;
+        padding: 0.7rem 1rem !important;
+        border: 1px solid transparent !important;
+        color: #94A3B8 !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease-in-out !important;
         cursor: pointer !important;
+        width: 100% !important;
+        display: block !important;
     }
     div[data-testid="stSidebar"] div[role="radiogroup"] > label:hover {
-        border-color: rgba(96, 165, 250, 0.4) !important;
-        background: rgba(30, 41, 59, 0.9) !important;
+        background: rgba(255, 255, 255, 0.05) !important;
         color: #F8FAFC !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
     }
     div[data-testid="stSidebar"] div[role="radiogroup"] > label[data-checked="true"] {
-        background: linear-gradient(135deg, #2563EB 0%, #4F46E5 100%) !important;
-        border-color: #60A5FA !important;
-        color: #FFFFFF !important;
+        background: linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(79, 70, 229, 0.25) 100%) !important;
+        border: 1px solid rgba(96, 165, 250, 0.4) !important;
+        color: #60A5FA !important;
         font-weight: 700 !important;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4) !important;
-    }
-    /* Hide red radio dots */
-    div[data-testid="stSidebar"] div[role="radiogroup"] label div[data-testid="stMarkdownContainer"] {
-        font-size: 0.9rem;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.2) !important;
     }
 
     /* Risk Badges */
@@ -400,9 +412,9 @@ OCCUPATION_MAP = {
 # 4. SIDEBAR NAVIGATION
 # ------------------------------------------------------------------------------
 st.sidebar.markdown("""
-<div style="padding: 0.5rem 0 1rem 0;">
-    <div style="font-size: 1.2rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.02em;">Student Success Analytics</div>
-    <div style="font-size: 0.78rem; color: #60A5FA; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem;">Risk Intelligence Platform</div>
+<div style="padding: 0.5rem 0 1.2rem 0;">
+    <div style="font-size: 1.25rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.02em;">Student Success Analytics</div>
+    <div style="font-size: 0.78rem; color: #60A5FA; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.2rem;">Risk Intelligence Platform</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -418,7 +430,7 @@ page = st.sidebar.radio(
     label_visibility="collapsed"
 )
 
-st.sidebar.markdown("<br><hr style='margin: 1rem 0; border-color: rgba(255, 255, 255, 0.08);'>", unsafe_allow_html=True)
+st.sidebar.markdown("<br><hr style='margin: 1.5rem 0 1rem 0; border-color: rgba(255, 255, 255, 0.08);'>", unsafe_allow_html=True)
 st.sidebar.markdown("""
 <div style="font-size: 0.78rem; color: #94A3B8; line-height: 1.6;">
     <span style="color: #64748B;">System Horizon:</span> End-of-1st-Semester<br>
