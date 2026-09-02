@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.abspath(os.path.dirname(__file__)))
 st.set_page_config(
     page_title="Student Success Analytics - Early Warning System",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 # Force a unified, premium Dark SaaS theme across all browser preference settings
@@ -38,25 +38,32 @@ st.markdown("""
         background-color: #0B0F19 !important;
     }
 
-    /* Fix top container padding so headers are never clipped under top bar */
-    .block-container {
-        padding-top: 3.5rem !important;
-        padding-bottom: 2.5rem !important;
-        max-width: 1300px;
+    /* Completely hide sidebar and collapse toggle */
+    section[data-testid="stSidebar"],
+    div[data-testid="collapsedControl"] {
+        display: none !important;
+        width: 0 !important;
     }
 
-    /* Brand Headers with safe line height and padding to prevent text clipping */
+    /* Full-width container padding */
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 3rem !important;
+        max-width: 1400px;
+    }
+
+    /* Top Brand Headers */
     .brand-title {
-        font-size: 2.2rem;
+        font-size: 2.1rem;
         font-weight: 800;
         line-height: 1.3 !important;
-        padding-top: 0.4rem;
-        padding-bottom: 0.2rem;
+        padding-top: 0.2rem;
+        padding-bottom: 0.1rem;
         background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         letter-spacing: -0.025em;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.2rem;
     }
     .brand-subtitle {
         font-size: 0.95rem;
@@ -150,56 +157,54 @@ st.markdown("""
         gap: 0.5rem;
     }
 
-    /* Sidebar Custom Styling */
-    section[data-testid="stSidebar"] {
-        background-color: #0F172A !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+    /* -------------------------------------------------------------------------- */
+    /* SLEEK TOP NAVBAR HORIZONTAL RADIO BUTTONS (WEBSITE TAB NAVIGATION)        */
+    /* -------------------------------------------------------------------------- */
+    div[data-testid="stRadio"] div[role="radiogroup"] {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: flex-end !important;
+        gap: 0.5rem !important;
+        flex-wrap: wrap !important;
     }
     
-    /* -------------------------------------------------------------------------- */
-    /* BULLETPROOF HIDE FOR RADIO CIRCLES & SVGS IN SIDEBAR NAVIGATION           */
-    /* -------------------------------------------------------------------------- */
-    div[data-testid="stSidebar"] div[role="radiogroup"] label svg,
-    div[data-testid="stSidebar"] div[role="radiogroup"] label input,
-    div[data-testid="stSidebar"] div[role="radiogroup"] label span[data-baseweb="radio"],
-    div[data-testid="stSidebar"] div[role="radiogroup"] label div[data-testid="stRadioButtonCustomIcon"],
-    div[data-testid="stSidebar"] div[role="radiogroup"] label > div:not([data-testid="stMarkdownContainer"]) {
+    /* Hide radio circles in top navbar */
+    div[data-testid="stRadio"] div[role="radiogroup"] label svg,
+    div[data-testid="stRadio"] div[role="radiogroup"] label input,
+    div[data-testid="stRadio"] div[role="radiogroup"] label span[data-baseweb="radio"],
+    div[data-testid="stRadio"] div[role="radiogroup"] label div[data-testid="stRadioButtonCustomIcon"],
+    div[data-testid="stRadio"] div[role="radiogroup"] label > div:not([data-testid="stMarkdownContainer"]) {
         display: none !important;
-        visibility: hidden !important;
         width: 0 !important;
         height: 0 !important;
         margin: 0 !important;
         padding: 0 !important;
     }
-    
-    /* Sleek Website Navigation Buttons */
-    div[data-testid="stSidebar"] div[role="radiogroup"] {
-        gap: 0.45rem !important;
-    }
-    div[data-testid="stSidebar"] div[role="radiogroup"] > label {
-        background: rgba(30, 41, 59, 0.3) !important;
+
+    /* Sleek top navbar tab items */
+    div[data-testid="stRadio"] div[role="radiogroup"] > label {
+        background: rgba(30, 41, 59, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 8px !important;
-        padding: 0.7rem 1rem !important;
-        border: 1px solid rgba(255, 255, 255, 0.04) !important;
+        padding: 0.55rem 1.1rem !important;
         color: #94A3B8 !important;
         font-weight: 600 !important;
+        font-size: 0.88rem !important;
         transition: all 0.2s ease-in-out !important;
         cursor: pointer !important;
-        width: 100% !important;
-        display: flex !important;
-        align-items: center !important;
+        white-space: nowrap !important;
     }
-    div[data-testid="stSidebar"] div[role="radiogroup"] > label:hover {
-        background: rgba(255, 255, 255, 0.06) !important;
+    div[data-testid="stRadio"] div[role="radiogroup"] > label:hover {
+        background: rgba(255, 255, 255, 0.08) !important;
         color: #F8FAFC !important;
-        border-color: rgba(255, 255, 255, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
     }
-    div[data-testid="stSidebar"] div[role="radiogroup"] > label[data-checked="true"] {
-        background: linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(79, 70, 229, 0.25) 100%) !important;
-        border: 1px solid rgba(96, 165, 250, 0.4) !important;
-        color: #60A5FA !important;
+    div[data-testid="stRadio"] div[role="radiogroup"] > label[data-checked="true"] {
+        background: linear-gradient(135deg, #2563EB 0%, #4F46E5 100%) !important;
+        border-color: #60A5FA !important;
+        color: #FFFFFF !important;
         font-weight: 700 !important;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.2) !important;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
     }
 
     /* Risk Badges */
@@ -416,36 +421,33 @@ OCCUPATION_MAP = {
 
 
 # ------------------------------------------------------------------------------
-# 4. SIDEBAR NAVIGATION
+# 4. TOP WEBSITE NAVBAR HEADER
 # ------------------------------------------------------------------------------
-st.sidebar.markdown("""
-<div style="padding: 0.5rem 0 1.2rem 0;">
-    <div style="font-size: 1.25rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.02em;">Student Success Analytics</div>
-    <div style="font-size: 0.78rem; color: #60A5FA; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.2rem;">Risk Intelligence Platform</div>
-</div>
-""", unsafe_allow_html=True)
+nav_col1, nav_col2 = st.columns([1.1, 2.9])
 
-page = st.sidebar.radio(
-    "NAVIGATION",
-    [
-        "Dashboard",
-        "Data Explorer",
-        "Model Performance",
-        "Student Risk Prediction",
-        "About Project"
-    ],
-    label_visibility="collapsed"
-)
+with nav_col1:
+    st.markdown("""
+    <div style="padding-top: 0.15rem;">
+        <div style="font-size: 1.35rem; font-weight: 800; background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em;">Student Success Analytics</div>
+        <div style="font-size: 0.72rem; color: #60A5FA; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Risk Intelligence Platform</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-st.sidebar.markdown("<br><hr style='margin: 1.5rem 0 1rem 0; border-color: rgba(255, 255, 255, 0.08);'>", unsafe_allow_html=True)
-st.sidebar.markdown("""
-<div style="font-size: 0.78rem; color: #94A3B8; line-height: 1.6;">
-    <span style="color: #64748B;">System Horizon:</span> End-of-1st-Semester<br>
-    <span style="color: #64748B;">Model:</span> Random Forest (Balanced)<br>
-    <span style="color: #64748B;">Primary Metric:</span> Macro F1 (0.6898)<br>
-    <span style="color: #64748B;">Platform Version:</span> 2.0.0
-</div>
-""", unsafe_allow_html=True)
+with nav_col2:
+    page = st.radio(
+        "TOP_NAV",
+        [
+            "Dashboard",
+            "Data Explorer",
+            "Model Performance",
+            "Student Risk Prediction",
+            "About Project"
+        ],
+        horizontal=True,
+        label_visibility="collapsed"
+    )
+
+st.markdown("<hr style='margin: 0.8rem 0 1.5rem 0; border-color: rgba(255, 255, 255, 0.08);'>", unsafe_allow_html=True)
 
 
 # ==============================================================================
