@@ -49,16 +49,14 @@ st.markdown("""
     .block-container {
         padding-top: 2rem !important;
         padding-bottom: 3rem !important;
-        max-width: 1400px;
+        max-width: 1350px;
     }
 
-    /* Top Brand Headers */
+    /* Brand Headers */
     .brand-title {
-        font-size: 2.1rem;
+        font-size: 2.2rem;
         font-weight: 800;
-        line-height: 1.3 !important;
-        padding-top: 0.2rem;
-        padding-bottom: 0.1rem;
+        line-height: 1.25 !important;
         background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -69,7 +67,51 @@ st.markdown("""
         font-size: 0.95rem;
         color: #94A3B8;
         font-weight: 500;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /* SLEEK NATIVE STREAMLIT TOP TABS STYLED AS WEBSITE NAVBAR                  */
+    /* -------------------------------------------------------------------------- */
+    div[data-baseweb="tab-list"] {
+        background: rgba(17, 24, 39, 0.6) !important;
+        padding: 0.4rem 0.5rem !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        gap: 0.5rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    button[data-baseweb="tab"] {
+        background: transparent !important;
+        border: 1px solid transparent !important;
+        border-radius: 8px !important;
+        padding: 0.6rem 1.25rem !important;
+        color: #94A3B8 !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        transition: all 0.2s ease-in-out !important;
+        height: auto !important;
+    }
+
+    button[data-baseweb="tab"]:hover {
+        background: rgba(255, 255, 255, 0.06) !important;
+        color: #F8FAFC !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: linear-gradient(135deg, #2563EB 0%, #4F46E5 100%) !important;
+        border-color: #60A5FA !important;
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+    }
+
+    /* Remove default tab border & underline */
+    div[data-baseweb="tab-highlight"],
+    div[data-baseweb="tab-border"] {
+        display: none !important;
     }
 
     /* Glassmorphic Dark Cards */
@@ -155,56 +197,6 @@ st.markdown("""
         display: flex;
         align-items: center;
         gap: 0.5rem;
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /* SLEEK TOP NAVBAR HORIZONTAL RADIO BUTTONS (WEBSITE TAB NAVIGATION)        */
-    /* -------------------------------------------------------------------------- */
-    div[data-testid="stRadio"] div[role="radiogroup"] {
-        display: flex !important;
-        flex-direction: row !important;
-        justify-content: flex-end !important;
-        gap: 0.5rem !important;
-        flex-wrap: wrap !important;
-    }
-    
-    /* Hide radio circles in top navbar */
-    div[data-testid="stRadio"] div[role="radiogroup"] label svg,
-    div[data-testid="stRadio"] div[role="radiogroup"] label input,
-    div[data-testid="stRadio"] div[role="radiogroup"] label span[data-baseweb="radio"],
-    div[data-testid="stRadio"] div[role="radiogroup"] label div[data-testid="stRadioButtonCustomIcon"],
-    div[data-testid="stRadio"] div[role="radiogroup"] label > div:not([data-testid="stMarkdownContainer"]) {
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    /* Sleek top navbar tab items */
-    div[data-testid="stRadio"] div[role="radiogroup"] > label {
-        background: rgba(30, 41, 59, 0.4) !important;
-        border: 1px solid rgba(255, 255, 255, 0.08) !important;
-        border-radius: 8px !important;
-        padding: 0.55rem 1.1rem !important;
-        color: #94A3B8 !important;
-        font-weight: 600 !important;
-        font-size: 0.88rem !important;
-        transition: all 0.2s ease-in-out !important;
-        cursor: pointer !important;
-        white-space: nowrap !important;
-    }
-    div[data-testid="stRadio"] div[role="radiogroup"] > label:hover {
-        background: rgba(255, 255, 255, 0.08) !important;
-        color: #F8FAFC !important;
-        border-color: rgba(255, 255, 255, 0.15) !important;
-    }
-    div[data-testid="stRadio"] div[role="radiogroup"] > label[data-checked="true"] {
-        background: linear-gradient(135deg, #2563EB 0%, #4F46E5 100%) !important;
-        border-color: #60A5FA !important;
-        color: #FFFFFF !important;
-        font-weight: 700 !important;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
     }
 
     /* Risk Badges */
@@ -421,42 +413,24 @@ OCCUPATION_MAP = {
 
 
 # ------------------------------------------------------------------------------
-# 4. TOP WEBSITE NAVBAR HEADER
+# 4. TOP WEBSITE BRAND & NAVIGATION TABS
 # ------------------------------------------------------------------------------
-nav_col1, nav_col2 = st.columns([1.1, 2.9])
+st.markdown('<div class="brand-title">Student Success Analytics</div>', unsafe_allow_html=True)
+st.markdown('<div class="brand-subtitle">Early Warning & Academic Risk Intelligence Platform</div>', unsafe_allow_html=True)
 
-with nav_col1:
-    st.markdown("""
-    <div style="padding-top: 0.15rem;">
-        <div style="font-size: 1.35rem; font-weight: 800; background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em;">Student Success Analytics</div>
-        <div style="font-size: 0.72rem; color: #60A5FA; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">Risk Intelligence Platform</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-with nav_col2:
-    page = st.radio(
-        "TOP_NAV",
-        [
-            "Dashboard",
-            "Data Explorer",
-            "Model Performance",
-            "Student Risk Prediction",
-            "About Project"
-        ],
-        horizontal=True,
-        label_visibility="collapsed"
-    )
-
-st.markdown("<hr style='margin: 0.8rem 0 1.5rem 0; border-color: rgba(255, 255, 255, 0.08);'>", unsafe_allow_html=True)
+tab_dash, tab_explore, tab_perf, tab_predict, tab_about = st.tabs([
+    "Dashboard",
+    "Data Explorer",
+    "Model Performance",
+    "Student Risk Prediction",
+    "About Project"
+])
 
 
 # ==============================================================================
-# PAGE 1: DASHBOARD
+# TAB 1: DASHBOARD
 # ==============================================================================
-if page == "Dashboard":
-    st.markdown('<div class="brand-title">Student Success Analytics</div>', unsafe_allow_html=True)
-    st.markdown('<div class="brand-subtitle">Early Warning & Academic Risk Intelligence</div>', unsafe_allow_html=True)
-
+with tab_dash:
     st.markdown("""
     <div class="saas-card">
         <div style="font-size: 0.95rem; color: #E2E8F0; line-height: 1.5;">
@@ -488,14 +462,12 @@ if page == "Dashboard":
         if df is not None:
             target_counts = df['Target'].value_counts()
             
-            # Interactive Plotly Bar Chart
-            fig_target = go.Figure()
-            
             categories = ['Graduate', 'Dropout', 'Enrolled']
             counts = [target_counts.get(c, 0) for c in categories]
             percentages = [(c / len(df)) * 100 for c in counts]
             colors = ['#16A34A', '#DC2626', '#2563EB']
 
+            fig_target = go.Figure()
             fig_target.add_trace(go.Bar(
                 y=categories,
                 x=counts,
@@ -511,9 +483,9 @@ if page == "Dashboard":
             fig_target.update_layout(
                 paper_bgcolor='rgba(0,0,0,0)',
                 plot_bgcolor='rgba(0,0,0,0)',
-                margin=dict(l=0, r=90, t=10, b=10),
+                margin=dict(l=0, r=130, t=10, b=10),
                 height=260,
-                xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.06)', title=None, tickfont=dict(color='#94A3B8')),
+                xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.06)', title=None, tickfont=dict(color='#94A3B8'), range=[0, 2700]),
                 yaxis=dict(showgrid=False, tickfont=dict(color='#F8FAFC', size=13, weight=600), autorange="reversed"),
             )
             st.plotly_chart(fig_target, use_container_width=True, config={'displayModeBar': False})
@@ -583,12 +555,9 @@ if page == "Dashboard":
 
 
 # ==============================================================================
-# PAGE 2: DATA EXPLORER
+# TAB 2: DATA EXPLORER
 # ==============================================================================
-elif page == "Data Explorer":
-    st.markdown('<div class="brand-title">Data Explorer</div>', unsafe_allow_html=True)
-    st.markdown('<div class="brand-subtitle">Explore the student dataset used to train the early warning model.</div>', unsafe_allow_html=True)
-
+with tab_explore:
     if df is not None:
         # Compact Summary Bar
         st.markdown("""
@@ -604,14 +573,14 @@ elif page == "Data Explorer":
 
         st.info("Data Leakage Safeguard: All six second-semester features (Curricular units 2nd sem...) are displayed in raw exploratory views below for domain context, but are strictly excluded from the prediction model because they represent future information unavailable at the end of the first semester.")
 
-        tab1, tab2, tab3, tab4 = st.tabs(["Dataset Preview", "Feature Overview", "Target Distribution", "Data Quality"])
+        subtab1, subtab2, subtab3, subtab4 = st.tabs(["Dataset Preview", "Feature Overview", "Target Distribution", "Data Quality"])
 
-        with tab1:
+        with subtab1:
             st.markdown('<div class="section-head">Dataset Preview</div>', unsafe_allow_html=True)
             st.dataframe(df.head(25), use_container_width=True)
             st.caption(f"Displaying first 25 of {len(df):,} student records.")
 
-        with tab2:
+        with subtab2:
             st.markdown('<div class="section-head">Feature Categorization (33 Total Input Features)</div>', unsafe_allow_html=True)
             c1, c2 = st.columns(2)
             with c1:
@@ -665,7 +634,7 @@ elif page == "Data Explorer":
                 </div>
                 """, unsafe_allow_html=True)
 
-        with tab3:
+        with subtab3:
             st.markdown('<div class="section-head">Interactive Visualizations</div>', unsafe_allow_html=True)
             chart_choice = st.selectbox(
                 "Select Interactive Analysis Chart:",
@@ -723,7 +692,7 @@ elif page == "Data Explorer":
                 fig_hist.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='#F8FAFC'))
                 st.plotly_chart(fig_hist, use_container_width=True)
 
-        with tab4:
+        with subtab4:
             st.markdown('<div class="section-head">Data Quality & Audit Verification</div>', unsafe_allow_html=True)
             q1, q2, q3, q4 = st.columns(4)
             with q1:
@@ -737,12 +706,9 @@ elif page == "Data Explorer":
 
 
 # ==============================================================================
-# PAGE 3: MODEL PERFORMANCE
+# TAB 3: MODEL PERFORMANCE
 # ==============================================================================
-elif page == "Model Performance":
-    st.markdown('<div class="brand-title">Model Performance</div>', unsafe_allow_html=True)
-    st.markdown('<div class="brand-subtitle">Benchmark of classical machine learning models for student outcome prediction.</div>', unsafe_allow_html=True)
-
+with tab_perf:
     # Selected Model Card
     st.markdown("""
     <div class="saas-card" style="border-left: 4px solid #2563EB;">
@@ -825,12 +791,9 @@ elif page == "Model Performance":
 
 
 # ==============================================================================
-# PAGE 4: STUDENT RISK PREDICTION
+# TAB 4: STUDENT RISK PREDICTION
 # ==============================================================================
-elif page == "Student Risk Prediction":
-    st.markdown('<div class="brand-title">Student Risk Assessment</div>', unsafe_allow_html=True)
-    st.markdown('<div class="brand-subtitle">Enter enrollment and first-semester information to estimate academic outcome and dropout risk.</div>', unsafe_allow_html=True)
-
+with tab_predict:
     if pipeline is None:
         st.error("Model pipeline is not loaded. Please ensure 'models/best_model.pkl' exists.")
     else:
@@ -1031,12 +994,9 @@ elif page == "Student Risk Prediction":
 
 
 # ==============================================================================
-# PAGE 5: ABOUT PROJECT
+# TAB 5: ABOUT PROJECT
 # ==============================================================================
-elif page == "About Project":
-    st.markdown('<div class="brand-title">About Project</div>', unsafe_allow_html=True)
-    st.markdown('<div class="brand-subtitle">Project Architecture, Dataset Specifications, and Methodology</div>', unsafe_allow_html=True)
-
+with tab_about:
     a1, a2 = st.columns(2)
 
     with a1:
