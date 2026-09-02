@@ -38,22 +38,25 @@ st.markdown("""
         background-color: #0B0F19 !important;
     }
 
-    /* Remove default Streamlit padding at top */
+    /* Fix top container padding so headers are never clipped under top bar */
     .block-container {
-        padding-top: 1.5rem !important;
-        padding-bottom: 2rem !important;
+        padding-top: 3.5rem !important;
+        padding-bottom: 2.5rem !important;
         max-width: 1300px;
     }
 
-    /* Brand Headers */
+    /* Brand Headers with safe line height and padding to prevent text clipping */
     .brand-title {
-        font-size: 2.1rem;
+        font-size: 2.2rem;
         font-weight: 800;
+        line-height: 1.3 !important;
+        padding-top: 0.4rem;
+        padding-bottom: 0.2rem;
         background: linear-gradient(135deg, #60A5FA 0%, #A855F7 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         letter-spacing: -0.025em;
-        margin-bottom: 0.15rem;
+        margin-bottom: 0.25rem;
     }
     .brand-subtitle {
         font-size: 0.95rem;
@@ -154,38 +157,42 @@ st.markdown("""
     }
     
     /* -------------------------------------------------------------------------- */
-    /* HIDE UGLY RADIO CIRCLES COMPLETELY & STYLE AS REAL WEBSITE NAVIGATION ITEMS */
+    /* BULLETPROOF HIDE FOR RADIO CIRCLES & SVGS IN SIDEBAR NAVIGATION           */
     /* -------------------------------------------------------------------------- */
-    div[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child {
+    div[data-testid="stSidebar"] div[role="radiogroup"] label svg,
+    div[data-testid="stSidebar"] div[role="radiogroup"] label input,
+    div[data-testid="stSidebar"] div[role="radiogroup"] label span[data-baseweb="radio"],
+    div[data-testid="stSidebar"] div[role="radiogroup"] label div[data-testid="stRadioButtonCustomIcon"],
+    div[data-testid="stSidebar"] div[role="radiogroup"] label > div:not([data-testid="stMarkdownContainer"]) {
         display: none !important;
-    }
-    div[data-testid="stSidebar"] div[role="radiogroup"] label div[data-testid="stRadioButtonCustomIcon"] {
-        display: none !important;
-    }
-    div[data-testid="stSidebar"] div[role="radiogroup"] label input[type="radio"] {
-        display: none !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     
-    /* Sleek Navigation Links */
+    /* Sleek Website Navigation Buttons */
     div[data-testid="stSidebar"] div[role="radiogroup"] {
-        gap: 0.4rem !important;
+        gap: 0.45rem !important;
     }
     div[data-testid="stSidebar"] div[role="radiogroup"] > label {
-        background: transparent !important;
+        background: rgba(30, 41, 59, 0.3) !important;
         border-radius: 8px !important;
         padding: 0.7rem 1rem !important;
-        border: 1px solid transparent !important;
+        border: 1px solid rgba(255, 255, 255, 0.04) !important;
         color: #94A3B8 !important;
         font-weight: 600 !important;
         transition: all 0.2s ease-in-out !important;
         cursor: pointer !important;
         width: 100% !important;
-        display: block !important;
+        display: flex !important;
+        align-items: center !important;
     }
     div[data-testid="stSidebar"] div[role="radiogroup"] > label:hover {
-        background: rgba(255, 255, 255, 0.05) !important;
+        background: rgba(255, 255, 255, 0.06) !important;
         color: #F8FAFC !important;
-        border-color: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
     }
     div[data-testid="stSidebar"] div[role="radiogroup"] > label[data-checked="true"] {
         background: linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(79, 70, 229, 0.25) 100%) !important;
