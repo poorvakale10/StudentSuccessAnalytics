@@ -418,12 +418,11 @@ OCCUPATION_MAP = {
 st.markdown('<div class="brand-title">Student Success Analytics</div>', unsafe_allow_html=True)
 st.markdown('<div class="brand-subtitle">Early Warning & Academic Risk Intelligence Platform</div>', unsafe_allow_html=True)
 
-tab_dash, tab_explore, tab_perf, tab_predict, tab_about = st.tabs([
+tab_dash, tab_explore, tab_perf, tab_predict = st.tabs([
     "Dashboard",
     "Data Explorer",
     "Model Performance",
-    "Student Risk Prediction",
-    "About Project"
+    "Student Risk Prediction"
 ])
 
 
@@ -993,90 +992,4 @@ with tab_predict:
                 st.error(f"Prediction error: {str(e)}")
 
 
-# ==============================================================================
-# TAB 5: ABOUT PROJECT
-# ==============================================================================
-with tab_about:
-    a1, a2 = st.columns(2)
 
-    with a1:
-        st.markdown("""
-        <div class="saas-card">
-            <div style="font-weight:700; color:#60A5FA; margin-bottom:0.5rem;">Project Overview</div>
-            <div style="font-size:0.85rem; color:#CBD5E1; line-height:1.5;">
-                This project provides an ML-powered early-warning decision-support prototype designed to identify students with elevated academic risk at the end of their first semester in higher education.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="saas-card">
-            <div style="font-weight:700; color:#60A5FA; margin-bottom:0.5rem;">Problem Statement & Objective</div>
-            <div style="font-size:0.85rem; color:#CBD5E1; line-height:1.5;">
-                Student attrition presents a major challenge for higher education institutions. By analyzing background demographics and first-semester academic performance, institutions can proactively deliver academic advising and intervention.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="saas-card">
-            <div style="font-weight:700; color:#60A5FA; margin-bottom:0.5rem;">Dataset & Target Breakdown</div>
-            <div style="font-size:0.85rem; color:#CBD5E1; line-height:1.5;">
-                UCI Predict Students' Dropout and Academic Success dataset containing 4,424 records.<br>
-                <b>Graduate:</b> 2,209 (49.93%)<br>
-                <b>Dropout:</b> 1,421 (32.12%)<br>
-                <b>Enrolled:</b> 794 (17.95%)
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with a2:
-        st.markdown("""
-        <div class="saas-card">
-            <div style="font-weight:700; color:#60A5FA; margin-bottom:0.5rem;">Machine Learning & Evaluation Strategy</div>
-            <div style="font-size:0.85rem; color:#CBD5E1; line-height:1.5;">
-                Benchmarked Logistic Regression, Decision Trees, Random Forest, and XGBoost across 80/20 stratified splits.<br>
-                Selected Model: <b>Random Forest (Balanced)</b><br>
-                Selection Metric: <b>Macro F1 (0.6898)</b> to account for multiclass imbalance.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="saas-card">
-            <div style="font-weight:700; color:#60A5FA; margin-bottom:0.5rem;">Data Leakage Prevention</div>
-            <div style="font-size:0.85rem; color:#CBD5E1; line-height:1.5;">
-                All six second-semester features are strictly excluded from prediction pipelines to preserve realistic end-of-first-semester early warning capability.
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="saas-card">
-            <div style="font-weight:700; color:#A855F7; margin-bottom:0.5rem;">Technology Stack</div>
-            <div style="font-size:0.85rem; color:#CBD5E1; line-height:1.5;">
-                Python, Pandas, NumPy, Scikit-learn, XGBoost, Plotly, Joblib, Streamlit
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown('<div class="section-head">Team Members</div>', unsafe_allow_html=True)
-    t1, t2, t3, t4 = st.columns(4)
-    with t1:
-        st.markdown("""<div class="kpi-card"><div style="font-weight:700; color:#F8FAFC;">Atharva Damale</div><div class="kpi-lbl">23102C0004</div></div>""", unsafe_allow_html=True)
-    with t2:
-        st.markdown("""<div class="kpi-card"><div style="font-weight:700; color:#F8FAFC;">Poorva Kale</div><div class="kpi-lbl">23102C0015</div></div>""", unsafe_allow_html=True)
-    with t3:
-        st.markdown("""<div class="kpi-card"><div style="font-weight:700; color:#F8FAFC;">Shreya Sathish</div><div class="kpi-lbl">23102C0019</div></div>""", unsafe_allow_html=True)
-    with t4:
-        st.markdown("""<div class="kpi-card"><div class="kpi-lbl" style="font-size:0.85rem; color:#F8FAFC;">Raj Yadav</div><div class="kpi-lbl">23102C0031</div></div>""", unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown("""
-    <div class="saas-card">
-        <div style="font-weight:700; color:#F8FAFC; margin-bottom:0.35rem;">Project Limitations</div>
-        <div style="font-size:0.85rem; color:#CBD5E1; line-height:1.5;">
-            Predictions reflect statistical associations in historical training data. The tool serves as an academic decision-support prototype and does not replace human judgment by professional advisors.
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
