@@ -1,32 +1,13 @@
 import React, { useState } from 'react';
 import { 
-  Calculator, CheckCircle, AlertTriangle, ShieldAlert, ChevronRight, ChevronLeft, Sparkles, RefreshCw, Award, ArrowUpRight, ArrowDownRight, Info, UserCheck, AlertOctagon
+  Calculator, CheckCircle, AlertTriangle, ShieldAlert, ChevronRight, ChevronLeft, Sparkles, RefreshCw, Award, ArrowUpRight, ArrowDownRight, Info, UserCheck, AlertOctagon, HeartPulse, Brain, Moon, Clock, Monitor
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-
-const COURSE_OPTIONS = [
-  { id: 9254, name: "Tourism" },
-  { id: 9500, name: "Nursing" },
-  { id: 9119, name: "Informatics Engineering" },
-  { id: 9147, name: "Management" },
-  { id: 9070, name: "Communication Design" },
-  { id: 9238, name: "Social Service (Day)" },
-  { id: 8014, name: "Social Service (Evening)" },
-  { id: 9670, name: "Advertising & Marketing" },
-  { id: 9773, name: "Journalism & Communication" },
-  { id: 171, name: "Animation and Multimedia Design" },
-  { id: 9003, name: "Agronomy" },
-  { id: 9085, name: "Veterinary Nursing" },
-  { id: 9556, name: "Oral Hygiene" },
-  { id: 9853, name: "Basic Education" },
-  { id: 33, name: "Biofuel Production Technologies" }
-];
 
 const PRESETS = {
   highRisk: {
     name: "High Dropout Risk Profile",
     icon: "🔴",
-    description: "55% 10th, 50% 12th, 4.2 GPA, 4.5 CGPA, Overdue tuition, debtor",
+    description: "55% 10th, 50% 12th, 4.2 GPA, Overdue tuition, Debtor, 9/10 Stress",
     values: {
       tenth_grade_pct: 55.0,
       twelfth_grade_pct: 50.0,
@@ -40,18 +21,16 @@ const PRESETS = {
       gender: 1,
       marital_status: 1,
       displaced: 1,
-      mother_qualification: 1,
-      father_qualification: 1,
-      application_mode: 1,
-      course: 9254,
-      unemployment_rate: 12.4,
-      gdp: -1.5
+      stress_level: 9,
+      screen_time_hours: 9.0,
+      sleep_hours: 4.5,
+      study_hours: 8.0
     }
   },
   graduate: {
     name: "High Performing Graduate Profile",
     icon: "🟢",
-    description: "88% 10th, 85% 12th, 8.8 GPA, 9.1 CGPA, Paid tuition, scholarship",
+    description: "88% 10th, 85% 12th, 8.8 GPA, Paid tuition, Scholarship, 3/10 Stress",
     values: {
       tenth_grade_pct: 88.0,
       twelfth_grade_pct: 85.0,
@@ -65,18 +44,16 @@ const PRESETS = {
       gender: 0,
       marital_status: 1,
       displaced: 1,
-      mother_qualification: 3,
-      father_qualification: 3,
-      application_mode: 1,
-      course: 9500,
-      unemployment_rate: 8.9,
-      gdp: 2.1
+      stress_level: 3,
+      screen_time_hours: 3.5,
+      sleep_hours: 8.0,
+      study_hours: 25.0
     }
   },
   borderline: {
     name: "Borderline Enrolled Profile",
     icon: "🟡",
-    description: "70% 10th, 65% 12th, 6.2 GPA, 6.5 CGPA, Paid tuition, no scholarship",
+    description: "70% 10th, 65% 12th, 6.2 GPA, Paid tuition, No scholarship, 6/10 Stress",
     values: {
       tenth_grade_pct: 70.0,
       twelfth_grade_pct: 65.0,
@@ -90,12 +67,10 @@ const PRESETS = {
       gender: 1,
       marital_status: 1,
       displaced: 0,
-      mother_qualification: 1,
-      father_qualification: 1,
-      application_mode: 1,
-      course: 9147,
-      unemployment_rate: 10.8,
-      gdp: 0.5
+      stress_level: 6,
+      screen_time_hours: 5.5,
+      sleep_hours: 6.5,
+      study_hours: 14.0
     }
   }
 };
@@ -116,19 +91,22 @@ export default function PredictPage({ showToast }) {
     gender: 1,
     marital_status: 1,
     displaced: 1,
-    mother_qualification: 1,
-    father_qualification: 1,
-    application_mode: 1,
-    course: 9254,
-    unemployment_rate: 10.8,
-    gdp: 1.74
+    stress_level: 5,
+    screen_time_hours: 4.5,
+    sleep_hours: 7.0,
+    study_hours: 18.0
   });
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  const handleChange = (field, val) => {
+  // Clamped handler to enforce min/max validation
+  const handleChange = (field, rawVal, minVal = 0, maxVal = 100) => {
+    let val = parseFloat(rawVal);
+    if (isNaN(val)) val = minVal;
+    if (val < minVal) val = minVal;
+    if (val > maxVal) val = maxVal;
     setFormData(prev => ({ ...prev, [field]: val }));
   };
 
@@ -162,11 +140,9 @@ export default function PredictPage({ showToast }) {
   };
 
   const stepsInfo = [
-    { num: 1, title: 'Academic' },
-    { num: 2, title: 'Financial' },
-    { num: 3, title: 'Demographic' },
-    { num: 4, title: 'Family Background' },
-    { num: 5, title: 'Context & Macro' },
+    { num: 1, title: 'Academic Performance' },
+    { num: 2, title: 'Financial Status' },
+    { num: 3, title: 'Demographics & Wellbeing' },
   ];
 
   return (
@@ -180,7 +156,7 @@ export default function PredictPage({ showToast }) {
             <span>Student Risk Predictor & SHAP Explainer</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Input academic (10th%, 12th%, Semester GPA, CGPA), financial, demographic & context signals to predict dropout risk.
+            Input academic (10th%, 12th%, GPA, CGPA), financial, demographic & mental wellbeing signals to evaluate retention risk.
           </p>
         </div>
 
@@ -218,7 +194,7 @@ export default function PredictPage({ showToast }) {
               <button
                 key={s.num}
                 onClick={() => setStep(s.num)}
-                className={`flex items-center gap-1.5 text-xs font-semibold transition-all ${
+                className={`flex items-center gap-2 text-xs font-semibold transition-all ${
                   step === s.num
                     ? 'text-indigo-400 scale-105'
                     : step > s.num
@@ -235,7 +211,7 @@ export default function PredictPage({ showToast }) {
                 }`}>
                   {s.num}
                 </span>
-                <span className="hidden sm:inline">{s.title}</span>
+                <span>{s.title}</span>
               </button>
             ))}
           </div>
@@ -243,61 +219,73 @@ export default function PredictPage({ showToast }) {
           {/* Form Content based on Active Step */}
           <form onSubmit={handleSubmit} className="space-y-6">
             
-            {/* Step 1: Academic */}
+            {/* Step 1: Academic Performance */}
             {step === 1 && (
               <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">1. Academic Performance Signals</h3>
+                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">1. Academic Marks & GPA Signals</h3>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">10th Grade Marks (%)</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">
+                      10th Grade Marks (0 - 100%)
+                    </label>
                     <input
                       type="number"
                       step="0.1"
                       min="0"
                       max="100"
                       value={formData.tenth_grade_pct}
-                      onChange={(e) => handleChange('tenth_grade_pct', parseFloat(e.target.value) || 0)}
+                      onChange={(e) => handleChange('tenth_grade_pct', e.target.value, 0, 100)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
+                      placeholder="e.g. 85.0"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">12th Grade Marks (%)</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">
+                      12th Grade Marks (0 - 100%)
+                    </label>
                     <input
                       type="number"
                       step="0.1"
                       min="0"
                       max="100"
                       value={formData.twelfth_grade_pct}
-                      onChange={(e) => handleChange('twelfth_grade_pct', parseFloat(e.target.value) || 0)}
+                      onChange={(e) => handleChange('twelfth_grade_pct', e.target.value, 0, 100)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
+                      placeholder="e.g. 80.0"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Current Semester GPA (0.0 - 10.0)</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">
+                      Current Semester GPA (0.0 - 10.0)
+                    </label>
                     <input
                       type="number"
                       step="0.1"
                       min="0"
                       max="10"
                       value={formData.current_sem_gpa}
-                      onChange={(e) => handleChange('current_sem_gpa', parseFloat(e.target.value) || 0)}
+                      onChange={(e) => handleChange('current_sem_gpa', e.target.value, 0, 10)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
+                      placeholder="e.g. 7.5"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Aggregate CGPA Until Now (0.0 - 10.0)</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">
+                      Aggregate CGPA Until Now (0.0 - 10.0)
+                    </label>
                     <input
                       type="number"
                       step="0.1"
                       min="0"
                       max="10"
                       value={formData.cgpa}
-                      onChange={(e) => handleChange('cgpa', parseFloat(e.target.value) || 0)}
+                      onChange={(e) => handleChange('cgpa', e.target.value, 0, 10)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
+                      placeholder="e.g. 7.8"
                     />
                   </div>
                 </div>
@@ -312,17 +300,17 @@ export default function PredictPage({ showToast }) {
                     max="1"
                     step="0.05"
                     value={formData.first_sem_approval_rate}
-                    onChange={(e) => handleChange('first_sem_approval_rate', parseFloat(e.target.value))}
+                    onChange={(e) => handleChange('first_sem_approval_rate', e.target.value, 0, 1)}
                     className="w-full accent-indigo-500 cursor-pointer mt-2"
                   />
                 </div>
               </div>
             )}
 
-            {/* Step 2: Financial */}
+            {/* Step 2: Financial Status */}
             {step === 2 && (
               <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">2. Financial Indicators (3 Features)</h3>
+                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">2. Financial Status Indicators</h3>
                 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-slate-700/60">
@@ -332,7 +320,7 @@ export default function PredictPage({ showToast }) {
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleChange('tuition_up_to_date', formData.tuition_up_to_date === 1 ? 0 : 1)}
+                      onClick={() => setFormData(prev => ({ ...prev, tuition_up_to_date: prev.tuition_up_to_date === 1 ? 0 : 1 }))}
                       className={`w-14 h-7 rounded-full transition-colors relative p-1 ${
                         formData.tuition_up_to_date === 1 ? 'bg-emerald-500' : 'bg-slate-700'
                       }`}
@@ -350,7 +338,7 @@ export default function PredictPage({ showToast }) {
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleChange('debtor', formData.debtor === 1 ? 0 : 1)}
+                      onClick={() => setFormData(prev => ({ ...prev, debtor: prev.debtor === 1 ? 0 : 1 }))}
                       className={`w-14 h-7 rounded-full transition-colors relative p-1 ${
                         formData.debtor === 1 ? 'bg-rose-500' : 'bg-slate-700'
                       }`}
@@ -368,7 +356,7 @@ export default function PredictPage({ showToast }) {
                     </div>
                     <button
                       type="button"
-                      onClick={() => handleChange('scholarship_holder', formData.scholarship_holder === 1 ? 0 : 1)}
+                      onClick={() => setFormData(prev => ({ ...prev, scholarship_holder: prev.scholarship_holder === 1 ? 0 : 1 }))}
                       className={`w-14 h-7 rounded-full transition-colors relative p-1 ${
                         formData.scholarship_holder === 1 ? 'bg-indigo-500' : 'bg-slate-700'
                       }`}
@@ -382,20 +370,20 @@ export default function PredictPage({ showToast }) {
               </div>
             )}
 
-            {/* Step 3: Demographic */}
+            {/* Step 3: Demographics & Mental Wellbeing */}
             {step === 3 && (
               <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">3. Demographic Background (4 Features)</h3>
+                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">3. Demographics, Mental Health & Lifestyle Signals</h3>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Age at Enrollment</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">Age at Enrollment (15 - 70)</label>
                     <input
                       type="number"
                       min="15"
                       max="70"
                       value={formData.age_at_enrollment}
-                      onChange={(e) => handleChange('age_at_enrollment', parseInt(e.target.value) || 20)}
+                      onChange={(e) => handleChange('age_at_enrollment', e.target.value, 15, 70)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
                     />
                   </div>
@@ -405,7 +393,7 @@ export default function PredictPage({ showToast }) {
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         type="button"
-                        onClick={() => handleChange('gender', 1)}
+                        onClick={() => setFormData(prev => ({ ...prev, gender: 1 }))}
                         className={`py-2 rounded-xl text-xs font-semibold border ${
                           formData.gender === 1 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500' : 'bg-slate-800 text-slate-400 border-slate-700'
                         }`}
@@ -414,7 +402,7 @@ export default function PredictPage({ showToast }) {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleChange('gender', 0)}
+                        onClick={() => setFormData(prev => ({ ...prev, gender: 0 }))}
                         className={`py-2 rounded-xl text-xs font-semibold border ${
                           formData.gender === 0 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500' : 'bg-slate-800 text-slate-400 border-slate-700'
                         }`}
@@ -425,136 +413,68 @@ export default function PredictPage({ showToast }) {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Marital Status</label>
-                    <select
-                      value={formData.marital_status}
-                      onChange={(e) => handleChange('marital_status', parseInt(e.target.value))}
-                      className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none cursor-pointer"
-                    >
-                      <option value={1}>Single</option>
-                      <option value={2}>Married</option>
-                      <option value={3}>Widower</option>
-                      <option value={4}>Divorced</option>
-                      <option value={5}>Facto Union</option>
-                      <option value={6}>Legally Separated</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Displaced (Living away from home)</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleChange('displaced', 1)}
-                        className={`py-2 rounded-xl text-xs font-semibold border ${
-                          formData.displaced === 1 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500' : 'bg-slate-800 text-slate-400 border-slate-700'
-                        }`}
-                      >
-                        Yes
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleChange('displaced', 0)}
-                        className={`py-2 rounded-xl text-xs font-semibold border ${
-                          formData.displaced === 0 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500' : 'bg-slate-800 text-slate-400 border-slate-700'
-                        }`}
-                      >
-                        No
-                      </button>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">
+                      Perceived Stress Level (1 - 10)
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="range"
+                        min="1"
+                        max="10"
+                        value={formData.stress_level}
+                        onChange={(e) => handleChange('stress_level', e.target.value, 1, 10)}
+                        className="w-full accent-rose-500 cursor-pointer"
+                      />
+                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
+                        formData.stress_level >= 7 ? 'bg-rose-500/20 text-rose-300' :
+                        formData.stress_level >= 5 ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'
+                      }`}>
+                        {formData.stress_level}/10
+                      </span>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 4: Family Background */}
-            {step === 4 && (
-              <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">4. Family Background (2 Features)</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Mother's Qualification Level</label>
-                    <select
-                      value={formData.mother_qualification}
-                      onChange={(e) => handleChange('mother_qualification', parseInt(e.target.value))}
-                      className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none cursor-pointer"
-                    >
-                      <option value={1}>Secondary Education (12th Year)</option>
-                      <option value={2}>Higher Education - Bachelor's Degree</option>
-                      <option value={3}>Higher Education - Master's / Doctorate</option>
-                      <option value={19}>Basic Education 3rd Cycle (9th Year)</option>
-                      <option value={37}>Basic Education 1st Cycle (4th Year)</option>
-                      <option value={38}>Unknown / Other</option>
-                    </select>
-                  </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Father's Qualification Level</label>
-                    <select
-                      value={formData.father_qualification}
-                      onChange={(e) => handleChange('father_qualification', parseInt(e.target.value))}
-                      className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none cursor-pointer"
-                    >
-                      <option value={1}>Secondary Education (12th Year)</option>
-                      <option value={2}>Higher Education - Bachelor's Degree</option>
-                      <option value={3}>Higher Education - Master's / Doctorate</option>
-                      <option value={19}>Basic Education 3rd Cycle (9th Year)</option>
-                      <option value={37}>Basic Education 1st Cycle (4th Year)</option>
-                      <option value={38}>Unknown / Other</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Step 5: Context & Macro */}
-            {step === 5 && (
-              <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">5. Enrollment Context & Macroeconomic (4 Features)</h3>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Enrolled Academic Course</label>
-                    <select
-                      value={formData.course}
-                      onChange={(e) => handleChange('course', parseInt(e.target.value))}
-                      className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none cursor-pointer"
-                    >
-                      {COURSE_OPTIONS.map(c => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Application Mode Code</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">
+                      Daily Screen Time (Hours)
+                    </label>
                     <input
                       type="number"
-                      value={formData.application_mode}
-                      onChange={(e) => handleChange('application_mode', parseInt(e.target.value) || 1)}
+                      step="0.5"
+                      min="0"
+                      max="24"
+                      value={formData.screen_time_hours}
+                      onChange={(e) => handleChange('screen_time_hours', e.target.value, 0, 24)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Unemployment Rate (%)</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">
+                      Nightly Sleep (Hours)
+                    </label>
                     <input
                       type="number"
-                      step="0.1"
-                      value={formData.unemployment_rate}
-                      onChange={(e) => handleChange('unemployment_rate', parseFloat(e.target.value))}
+                      step="0.5"
+                      min="0"
+                      max="12"
+                      value={formData.sleep_hours}
+                      onChange={(e) => handleChange('sleep_hours', e.target.value, 0, 12)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">GDP Growth Rate (%)</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">
+                      Weekly Study Hours
+                    </label>
                     <input
                       type="number"
-                      step="0.1"
-                      value={formData.gdp}
-                      onChange={(e) => handleChange('gdp', parseFloat(e.target.value))}
+                      step="1"
+                      min="0"
+                      max="100"
+                      value={formData.study_hours}
+                      onChange={(e) => handleChange('study_hours', e.target.value, 0, 100)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
                     />
                   </div>
@@ -575,7 +495,7 @@ export default function PredictPage({ showToast }) {
                 </button>
               ) : <div />}
 
-              {step < 5 ? (
+              {step < 3 ? (
                 <button
                   type="button"
                   onClick={() => setStep(step + 1)}
@@ -619,7 +539,7 @@ export default function PredictPage({ showToast }) {
               </div>
               <h3 className="text-lg font-bold text-white">Ready for Risk Evaluation</h3>
               <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
-                Complete the 5-step feature form or select a quick profile preset above to generate an immediate student dropout prediction with SHAP explanations.
+                Complete the 3-step feature form or select a quick profile preset above to generate an immediate student dropout prediction with SHAP explanations.
               </p>
             </div>
           ) : (
@@ -703,7 +623,7 @@ export default function PredictPage({ showToast }) {
               <div className="bg-slate-900/80 p-6 rounded-2xl border border-slate-800 space-y-3">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <UserCheck className="w-4 h-4 text-emerald-400" />
-                  <span>Advisor Next Steps & Interventions</span>
+                  <span>Advisor Next Steps & Wellbeing Interventions</span>
                 </h3>
 
                 <ul className="space-y-2">

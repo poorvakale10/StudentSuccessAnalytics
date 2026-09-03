@@ -157,10 +157,6 @@ def format_feature_explanation(feat: str, val: Any, shap_val: float) -> str:
         else:
             return f"Enrollment at age {val} aligns with traditional academic progression."
 
-    elif feat == 'course':
-        course_name = COURSE_MAP.get(int(val), f"Course {val}") if str(val).isdigit() else val
-        return f"Enrolled in {course_name}, which has specific historical completion trends."
-
     elif feat == 'displaced':
         if val == 1 or val == "Yes":
             return "Living away from home may introduce social dislocation or housing stress."
@@ -183,7 +179,7 @@ def predict_student_risk(input_data: StudentFeatureInput):
     target_names = artifacts['target_names']
     explainer = artifacts['explainer']
 
-    # Derive the 18 feature values from user-friendly academic inputs
+    # Map user-friendly 10th%, 12th%, Current Sem GPA, CGPA to 18 ML model features
     prev_qual_grade = input_data.previous_qualification_grade
     if prev_qual_grade is None:
         avg_pct = (input_data.tenth_grade_pct + input_data.twelfth_grade_pct) / 2.0
@@ -198,7 +194,7 @@ def predict_student_risk(input_data: StudentFeatureInput):
 
     feature_dict = {
         'previous_qualification_grade': float(prev_qual_grade),
-        'admission_grade': float(input_data.twelfth_grade_pct * 2.0), # 12th % mapped to admission grade
+        'admission_grade': float(input_data.twelfth_grade_pct * 2.0),
         'first_sem_grade': float(first_sem_g),
         'first_sem_approval_rate': float(input_data.first_sem_approval_rate),
         'attendance_type': int(att_type),
@@ -209,12 +205,12 @@ def predict_student_risk(input_data: StudentFeatureInput):
         'gender': int(input_data.gender),
         'marital_status': int(input_data.marital_status),
         'displaced': int(input_data.displaced),
-        'mother_qualification': int(input_data.mother_qualification),
-        'father_qualification': int(input_data.father_qualification),
-        'application_mode': int(input_data.application_mode),
-        'course': int(input_data.course),
-        'unemployment_rate': float(input_data.unemployment_rate),
-        'gdp': float(input_data.gdp)
+        'mother_qualification': int(input_data.mother_qualification or 1),
+        'father_qualification': int(input_data.father_qualification or 1),
+        'application_mode': int(input_data.application_mode or 1),
+        'course': int(input_data.course or 9254),
+        'unemployment_rate': float(input_data.unemployment_rate or 10.8),
+        'gdp': float(input_data.gdp or 1.74)
     }
 
     df_single = pd.DataFrame([feature_dict])[feature_names]
@@ -281,9 +277,7 @@ def predict_student_risk(input_data: StudentFeatureInput):
         explanation_text = format_feature_explanation(feat, val, s_val)
 
         val_display = val
-        if feat == 'course':
-            val_display = COURSE_MAP.get(int(val), f"Code {val}")
-        elif feat == 'first_sem_approval_rate':
+        if feat == 'first_sem_approval_rate':
             val_display = f"{int(val * 100)}%"
         elif feat == 'first_sem_grade':
             val_display = f"GPA {input_data.current_sem_gpa}/10 | CGPA {input_data.cgpa}/10"
@@ -303,26 +297,46 @@ def predict_student_risk(input_data: StudentFeatureInput):
             explanation=explanation_text
         ))
 
+    # Add Mental Health & Lifestyle factor explanation if high stress or low sleep
+    if input_data.stress_level >= 7:
+        top_factors.append(FactorExplanation(
+            feature="stress_level",
+            label="Perceived Stress Level",
+            value=f"{input_data.stress_level} / 10",
+            shap_value=0.035,
+            effect="Increases Dropout Risk",
+            explanation=f"High reported stress level ({input_data.stress_level}/10) places emotional pressure on academic persistence."
+        ))
+
     recommendations = []
-    if feature_dict['tuition_up_to_date'] == 0 or feature_dict['debtor'] == 1:
+    if input_data.stress_level >= 7:
+        recommendations.append("Refer student to Student Wellness & Psychological Counseling Services for stress management.")
+
+    if input_data.sleep_hours < 6.0:
+        recommendations.append("Provide sleep hygiene and wellness guidance to reduce fatigue-related academic burnout.")
+
+    if input_data.screen_time_hours > 7.0:
+        recommendations.append("Recommend digital detox and structured study-life balance workshops.")
+
+    if input_data.tuition_up_to_date == 0 or input_data.debtor == 1:
         recommendations.append("Connect student with Student Financial Services for emergency micro-grants or tuition payment deferral plans.")
     
-    if feature_dict['first_sem_approval_rate'] < 0.6 or input_data.current_sem_gpa < 6.0:
+    if input_data.first_sem_approval_rate < 0.6 or input_data.current_sem_gpa < 6.0:
         recommendations.append("Assign an academic peer tutor and schedule mandatory bi-weekly academic progress reviews.")
 
-    if feature_dict['displaced'] == 1 and risk_tier in ['High', 'Medium']:
+    if input_data.displaced == 1 and risk_tier in ['High', 'Medium']:
         recommendations.append("Provide campus housing and social integration advisory support to mitigate student dislocation.")
 
     if risk_tier == 'High' and len(recommendations) < 3:
         recommendations.append("Schedule an urgent 1-on-1 counselor intervention within 5 business days.")
 
-    if risk_tier == 'Low':
+    if risk_tier == 'Low' and len(recommendations) == 0:
         recommendations.append("Recommend student for peer mentorship opportunities and undergraduate research programs.")
 
     return PredictionResponse(
         predicted_class=predicted_class,
         probabilities=prob_dict,
         risk_tier=risk_tier,
-        top_factors=top_factors,
+        top_factors=top_factors[:5],
         recommendations=recommendations
     )
