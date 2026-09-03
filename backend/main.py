@@ -13,7 +13,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS for frontend development
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,17 +26,16 @@ MODEL_PKL_PATH = os.path.join(ARTIFACTS_DIR, "model_artifacts.pkl")
 METRICS_JSON_PATH = os.path.join(ARTIFACTS_DIR, "model_metrics.json")
 INSIGHTS_JSON_PATH = os.path.join(ARTIFACTS_DIR, "dataset_insights.json")
 
-# Global state for loaded artifacts
 artifacts = None
 metrics_data = None
 insights_data = None
 
 FEATURE_LABELS = {
-    'previous_qualification_grade': "Previous Qualification Grade",
-    'admission_grade': "Admission Grade",
-    'first_sem_grade': "1st Sem Average Grade",
+    'previous_qualification_grade': "10th & 12th Grade Marks",
+    'admission_grade': "Admission Score",
+    'first_sem_grade': "GPA & Aggregate CGPA",
     'first_sem_approval_rate': "1st Sem Approval Rate",
-    'attendance_type': "Attendance Type",
+    'attendance_type': "Attendance Mode",
     'debtor': "Debtor Status",
     'tuition_up_to_date': "Tuition Fees Status",
     'scholarship_holder': "Scholarship Status",
@@ -81,8 +79,6 @@ def load_resources():
         with open(MODEL_PKL_PATH, "rb") as f:
             artifacts = pickle.load(f)
         print("Loaded ML model artifacts successfully.")
-    else:
-        print("Warning: ML model artifacts pickle not found.")
 
     if os.path.exists(METRICS_JSON_PATH):
         with open(METRICS_JSON_PATH, "r") as f:
@@ -119,66 +115,54 @@ def format_feature_explanation(feat: str, val: Any, shap_val: float) -> str:
     lbl = FEATURE_LABELS.get(feat, feat)
     
     if feat == 'first_sem_approval_rate':
-        pct = int(val * 100)
+        pct = int(val * 100) if isinstance(val, (int, float)) else val
         if shap_val > 0:
-            return f"Low approval rate of {pct}% in 1st semester courses significantly raises dropout risk."
+            return f"Low approval rate ({pct}%) in 1st semester courses significantly raises dropout risk."
         else:
             return f"Strong course completion rate ({pct}%) in 1st semester reinforces academic persistence."
 
     elif feat == 'first_sem_grade':
         if shap_val > 0:
-            return f"1st semester average grade ({val:.1f}/20) is below academic stability benchmark."
+            return f"Current semester GPA and CGPA profile ({val:.1f}/20 equivalent) falls below target stability."
         else:
-            return f"High 1st semester GPA ({val:.1f}/20) acts as a strong protective academic factor."
+            return f"High semester GPA and CGPA ({val:.1f}/20 equivalent) acts as a strong protective academic factor."
+
+    elif feat == 'previous_qualification_grade':
+        if shap_val > 0:
+            return f"10th & 12th grade percentage foundation ({val/2.0:.1f}%) contributes to risk profile."
+        else:
+            return f"Solid 10th & 12th grade percentage foundation ({val/2.0:.1f}%) supports learning readiness."
 
     elif feat == 'tuition_up_to_date':
-        if val == 0:
+        if val == 0 or val == "No":
             return "Tuition fees are overdue, creating immediate financial risk of administrative drop."
         else:
             return "Tuition payments are up to date, eliminating administrative financial hold."
 
     elif feat == 'debtor':
-        if val == 1:
+        if val == 1 or val == "Yes":
             return "Student is flagged as a debtor with outstanding institutional balances."
         else:
             return "Student has no outstanding debt with the institution."
 
     elif feat == 'scholarship_holder':
-        if val == 1:
+        if val == 1 or val == "Yes":
             return "Scholarship funding provides crucial financial stability and lowers risk."
         else:
             return "Lack of scholarship grant means higher self-funded financial burden."
 
     elif feat == 'age_at_enrollment':
-        if val > 24:
+        if isinstance(val, (int, float)) and val > 24:
             return f"Age at enrollment ({val} years) is higher than traditional student entry age."
         else:
             return f"Enrollment at age {val} aligns with traditional academic progression."
 
-    elif feat == 'attendance_type':
-        if val == 0:
-            return "Evening attendance often overlaps with full-time employment commitments."
-        else:
-            return "Daytime attendance provides full access to campus resources and study groups."
-
-    elif feat == 'admission_grade':
-        if shap_val > 0:
-            return f"Lower entry admission score ({val:.1f}/200) indicates initial preparation gap."
-        else:
-            return f"Strong entry admission score ({val:.1f}/200) reflects solid high school foundation."
-
-    elif feat == 'previous_qualification_grade':
-        if shap_val > 0:
-            return f"Prior qualification score ({val:.1f}/200) contributes to risk profile."
-        else:
-            return f"Solid prior qualification score ({val:.1f}/200) supports learning readiness."
-
     elif feat == 'course':
-        course_name = COURSE_MAP.get(int(val), f"Course {val}")
+        course_name = COURSE_MAP.get(int(val), f"Course {val}") if str(val).isdigit() else val
         return f"Enrolled in {course_name}, which has specific historical completion trends."
 
     elif feat == 'displaced':
-        if val == 1:
+        if val == 1 or val == "Yes":
             return "Living away from home may introduce social dislocation or housing stress."
         else:
             return "Living locally provides family and community proximity."
@@ -199,9 +183,41 @@ def predict_student_risk(input_data: StudentFeatureInput):
     target_names = artifacts['target_names']
     explainer = artifacts['explainer']
 
-    # Convert input pydantic object to feature dictionary
-    input_dict = input_data.model_dump()
-    df_single = pd.DataFrame([input_dict])[feature_names]
+    # Derive the 18 feature values from user-friendly academic inputs
+    prev_qual_grade = input_data.previous_qualification_grade
+    if prev_qual_grade is None:
+        avg_pct = (input_data.tenth_grade_pct + input_data.twelfth_grade_pct) / 2.0
+        prev_qual_grade = avg_pct * 2.0  # Scale 0-100% to 0-200
+
+    first_sem_g = input_data.first_sem_grade
+    if first_sem_g is None:
+        avg_gpa = (input_data.current_sem_gpa + input_data.cgpa) / 2.0
+        first_sem_g = avg_gpa * 2.0  # Scale 0-10 GPA to 0-20
+
+    att_type = input_data.attendance_type if input_data.attendance_type is not None else 1
+
+    feature_dict = {
+        'previous_qualification_grade': float(prev_qual_grade),
+        'admission_grade': float(input_data.twelfth_grade_pct * 2.0), # 12th % mapped to admission grade
+        'first_sem_grade': float(first_sem_g),
+        'first_sem_approval_rate': float(input_data.first_sem_approval_rate),
+        'attendance_type': int(att_type),
+        'debtor': int(input_data.debtor),
+        'tuition_up_to_date': int(input_data.tuition_up_to_date),
+        'scholarship_holder': int(input_data.scholarship_holder),
+        'age_at_enrollment': int(input_data.age_at_enrollment),
+        'gender': int(input_data.gender),
+        'marital_status': int(input_data.marital_status),
+        'displaced': int(input_data.displaced),
+        'mother_qualification': int(input_data.mother_qualification),
+        'father_qualification': int(input_data.father_qualification),
+        'application_mode': int(input_data.application_mode),
+        'course': int(input_data.course),
+        'unemployment_rate': float(input_data.unemployment_rate),
+        'gdp': float(input_data.gdp)
+    }
+
+    df_single = pd.DataFrame([feature_dict])[feature_names]
 
     # Predict probabilities
     if best_model_name in ['Logistic Regression', 'SVM']:
@@ -218,13 +234,10 @@ def predict_student_risk(input_data: StudentFeatureInput):
 
     dropout_prob = prob_dict['Dropout']
     enrolled_prob = prob_dict['Enrolled']
-    grad_prob = prob_dict['Graduate']
 
-    # Predicted class (argmax)
     pred_idx = int(np.argmax(probs))
     predicted_class = target_names[pred_idx]
 
-    # Assign Risk Tier
     if dropout_prob >= 0.45 or predicted_class == 'Dropout':
         risk_tier = 'High'
     elif dropout_prob >= 0.22 or enrolled_prob >= 0.35:
@@ -233,15 +246,12 @@ def predict_student_risk(input_data: StudentFeatureInput):
         risk_tier = 'Low'
 
     # SHAP Explainability
-    # For multiclass, explainer output handles class 0 (Dropout)
     try:
         if best_model_name in ['Random Forest', 'XGBoost']:
             shap_values = explainer.shap_values(df_single)
             if isinstance(shap_values, list):
-                # List of arrays per class, pick class 0 (Dropout)
                 shap_class0 = shap_values[0][0]
             elif len(shap_values.shape) == 3:
-                # Shape: (1, num_features, 3) or (1, 3, num_features)
                 if shap_values.shape[2] == 3:
                     shap_class0 = shap_values[0, :, 0]
                 else:
@@ -249,45 +259,39 @@ def predict_student_risk(input_data: StudentFeatureInput):
             else:
                 shap_class0 = shap_values[0]
         else:
-            # Kernel/Linear explainer
             shap_obj = explainer(df_single)
             shap_class0 = shap_obj.values[0, :, 0] if len(shap_obj.values.shape) == 3 else shap_obj.values[0]
 
     except Exception as e:
         print(f"SHAP calculation fallback: {e}")
-        # Fallback to feature importance proxy if SHAP encounters format edge case
         if hasattr(best_model, 'feature_importances_'):
             shap_class0 = best_model.feature_importances_
         else:
             shap_class0 = np.ones(len(feature_names))
 
-    # Top contributing factors for Dropout Risk (Class 0)
     top_indices = np.argsort(np.abs(shap_class0))[::-1][:5]
     
     top_factors = []
     for idx in top_indices:
         feat = feature_names[idx]
-        val = input_dict[feat]
+        val = feature_dict[feat]
         s_val = float(shap_class0[idx])
 
-        if s_val > 0:
-            effect = "Increases Dropout Risk"
-        else:
-            effect = "Decreases Dropout Risk"
-
+        effect = "Increases Dropout Risk" if s_val > 0 else "Decreases Dropout Risk"
         explanation_text = format_feature_explanation(feat, val, s_val)
 
-        # Human friendly format for UI value display
         val_display = val
         if feat == 'course':
             val_display = COURSE_MAP.get(int(val), f"Code {val}")
         elif feat == 'first_sem_approval_rate':
             val_display = f"{int(val * 100)}%"
-        elif feat in ['debtor', 'tuition_up_to_date', 'scholarship_holder', 'displaced', 'attendance_type', 'gender']:
+        elif feat == 'first_sem_grade':
+            val_display = f"GPA {input_data.current_sem_gpa}/10 | CGPA {input_data.cgpa}/10"
+        elif feat == 'previous_qualification_grade':
+            val_display = f"10th: {input_data.tenth_grade_pct}% | 12th: {input_data.twelfth_grade_pct}%"
+        elif feat in ['debtor', 'tuition_up_to_date', 'scholarship_holder', 'displaced', 'gender']:
             val_display = "Yes" if val == 1 else "No"
-            if feat == 'attendance_type':
-                val_display = "Daytime" if val == 1 else "Evening"
-            elif feat == 'gender':
+            if feat == 'gender':
                 val_display = "Male" if val == 1 else "Female"
 
         top_factors.append(FactorExplanation(
@@ -299,19 +303,15 @@ def predict_student_risk(input_data: StudentFeatureInput):
             explanation=explanation_text
         ))
 
-    # Actionable Recommendations based on risk profile
     recommendations = []
-    if input_dict['tuition_up_to_date'] == 0 or input_dict['debtor'] == 1:
+    if feature_dict['tuition_up_to_date'] == 0 or feature_dict['debtor'] == 1:
         recommendations.append("Connect student with Student Financial Services for emergency micro-grants or tuition payment deferral plans.")
     
-    if input_dict['first_sem_approval_rate'] < 0.6 or input_dict['first_sem_grade'] < 11.5:
+    if feature_dict['first_sem_approval_rate'] < 0.6 or input_data.current_sem_gpa < 6.0:
         recommendations.append("Assign an academic peer tutor and schedule mandatory bi-weekly academic progress reviews.")
 
-    if input_dict['displaced'] == 1 and risk_tier in ['High', 'Medium']:
+    if feature_dict['displaced'] == 1 and risk_tier in ['High', 'Medium']:
         recommendations.append("Provide campus housing and social integration advisory support to mitigate student dislocation.")
-
-    if input_dict['attendance_type'] == 0:
-        recommendations.append("Offer flexible online learning modules and evening tutoring office hours.")
 
     if risk_tier == 'High' and len(recommendations) < 3:
         recommendations.append("Schedule an urgent 1-on-1 counselor intervention within 5 business days.")

@@ -26,13 +26,13 @@ const PRESETS = {
   highRisk: {
     name: "High Dropout Risk Profile",
     icon: "🔴",
-    description: "Overdue tuition, debtor, 20% 1st sem approval, 8.5/20 grade",
+    description: "55% 10th, 50% 12th, 4.2 GPA, 4.5 CGPA, Overdue tuition, debtor",
     values: {
-      previous_qualification_grade: 120.0,
-      admission_grade: 115.0,
-      first_sem_grade: 8.5,
+      tenth_grade_pct: 55.0,
+      twelfth_grade_pct: 50.0,
+      current_sem_gpa: 4.2,
+      cgpa: 4.5,
       first_sem_approval_rate: 0.20,
-      attendance_type: 1,
       debtor: 1,
       tuition_up_to_date: 0,
       scholarship_holder: 0,
@@ -51,13 +51,13 @@ const PRESETS = {
   graduate: {
     name: "High Performing Graduate Profile",
     icon: "🟢",
-    description: "Paid tuition, scholarship holder, 100% approval, 15.5/20 grade",
+    description: "88% 10th, 85% 12th, 8.8 GPA, 9.1 CGPA, Paid tuition, scholarship",
     values: {
-      previous_qualification_grade: 150.0,
-      admission_grade: 145.0,
-      first_sem_grade: 15.5,
+      tenth_grade_pct: 88.0,
+      twelfth_grade_pct: 85.0,
+      current_sem_gpa: 8.8,
+      cgpa: 9.1,
       first_sem_approval_rate: 1.0,
-      attendance_type: 1,
       debtor: 0,
       tuition_up_to_date: 1,
       scholarship_holder: 1,
@@ -76,13 +76,13 @@ const PRESETS = {
   borderline: {
     name: "Borderline Enrolled Profile",
     icon: "🟡",
-    description: "Paid tuition, no scholarship, 50% approval, 11.0/20 grade",
+    description: "70% 10th, 65% 12th, 6.2 GPA, 6.5 CGPA, Paid tuition, no scholarship",
     values: {
-      previous_qualification_grade: 130.0,
-      admission_grade: 125.0,
-      first_sem_grade: 11.0,
+      tenth_grade_pct: 70.0,
+      twelfth_grade_pct: 65.0,
+      current_sem_gpa: 6.2,
+      cgpa: 6.5,
       first_sem_approval_rate: 0.50,
-      attendance_type: 1,
       debtor: 0,
       tuition_up_to_date: 1,
       scholarship_holder: 0,
@@ -104,11 +104,11 @@ export default function PredictPage({ showToast }) {
   const [step, setStep] = useState(1);
 
   const [formData, setFormData] = useState({
-    previous_qualification_grade: 130.0,
-    admission_grade: 125.0,
-    first_sem_grade: 12.0,
+    tenth_grade_pct: 75.0,
+    twelfth_grade_pct: 72.0,
+    current_sem_gpa: 7.5,
+    cgpa: 7.8,
     first_sem_approval_rate: 0.80,
-    attendance_type: 1,
     debtor: 0,
     tuition_up_to_date: 1,
     scholarship_holder: 0,
@@ -180,7 +180,7 @@ export default function PredictPage({ showToast }) {
             <span>Student Risk Predictor & SHAP Explainer</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Input the 18 curated student features to generate instant 3-class retention prediction & SHAP factor breakdown.
+            Input academic (10th%, 12th%, Semester GPA, CGPA), financial, demographic & context signals to predict dropout risk.
           </p>
         </div>
 
@@ -246,90 +246,75 @@ export default function PredictPage({ showToast }) {
             {/* Step 1: Academic */}
             {step === 1 && (
               <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">1. Academic Performance (5 Features)</h3>
+                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">1. Academic Performance Signals</h3>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Previous Qualification Grade (0 - 200)</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">10th Grade Marks (%)</label>
                     <input
                       type="number"
                       step="0.1"
                       min="0"
-                      max="200"
-                      value={formData.previous_qualification_grade}
-                      onChange={(e) => handleChange('previous_qualification_grade', parseFloat(e.target.value))}
+                      max="100"
+                      value={formData.tenth_grade_pct}
+                      onChange={(e) => handleChange('tenth_grade_pct', parseFloat(e.target.value) || 0)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Admission Grade (0 - 200)</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">12th Grade Marks (%)</label>
                     <input
                       type="number"
                       step="0.1"
                       min="0"
-                      max="200"
-                      value={formData.admission_grade}
-                      onChange={(e) => handleChange('admission_grade', parseFloat(e.target.value))}
+                      max="100"
+                      value={formData.twelfth_grade_pct}
+                      onChange={(e) => handleChange('twelfth_grade_pct', parseFloat(e.target.value) || 0)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">1st Semester Average Grade (0 - 20)</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">Current Semester GPA (0.0 - 10.0)</label>
                     <input
                       type="number"
                       step="0.1"
                       min="0"
-                      max="20"
-                      value={formData.first_sem_grade}
-                      onChange={(e) => handleChange('first_sem_grade', parseFloat(e.target.value))}
+                      max="10"
+                      value={formData.current_sem_gpa}
+                      onChange={(e) => handleChange('current_sem_gpa', parseFloat(e.target.value) || 0)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
-                      1st Sem Approval Rate ({(formData.first_sem_approval_rate * 100).toFixed(0)}%)
-                    </label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">Aggregate CGPA Until Now (0.0 - 10.0)</label>
                     <input
-                      type="range"
+                      type="number"
+                      step="0.1"
                       min="0"
-                      max="1"
-                      step="0.05"
-                      value={formData.first_sem_approval_rate}
-                      onChange={(e) => handleChange('first_sem_approval_rate', parseFloat(e.target.value))}
-                      className="w-full accent-indigo-500 cursor-pointer mt-2"
+                      max="10"
+                      value={formData.cgpa}
+                      onChange={(e) => handleChange('cgpa', parseFloat(e.target.value) || 0)}
+                      className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1.5">Attendance Type</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => handleChange('attendance_type', 1)}
-                      className={`py-2.5 rounded-xl text-xs font-semibold border transition-all ${
-                        formData.attendance_type === 1
-                          ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500'
-                          : 'bg-slate-800 text-slate-400 border-slate-700'
-                      }`}
-                    >
-                      Daytime Attendance
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleChange('attendance_type', 0)}
-                      className={`py-2.5 rounded-xl text-xs font-semibold border transition-all ${
-                        formData.attendance_type === 0
-                          ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500'
-                          : 'bg-slate-800 text-slate-400 border-slate-700'
-                      }`}
-                    >
-                      Evening Attendance
-                    </button>
-                  </div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">
+                    1st Sem Course Approval Rate ({(formData.first_sem_approval_rate * 100).toFixed(0)}%)
+                  </label>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.05"
+                    value={formData.first_sem_approval_rate}
+                    onChange={(e) => handleChange('first_sem_approval_rate', parseFloat(e.target.value))}
+                    className="w-full accent-indigo-500 cursor-pointer mt-2"
+                  />
                 </div>
               </div>
             )}
