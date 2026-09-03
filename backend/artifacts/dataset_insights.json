@@ -1,0 +1,320 @@
+{
+  "total_students": 4424,
+  "overall_rates": {
+    "dropout": 0.3212,
+    "graduate": 0.4993,
+    "enrolled": 0.1795
+  },
+  "counts": {
+    "dropout": 1421,
+    "graduate": 2209,
+    "enrolled": 794
+  },
+  "course_stats": [
+    {
+      "course_id": 9500,
+      "course_name": "Nursing",
+      "total": 766,
+      "dropout_count": 118,
+      "graduate_count": 548,
+      "enrolled_count": 100,
+      "dropout_rate": 0.154,
+      "graduate_rate": 0.7154
+    },
+    {
+      "course_id": 9147,
+      "course_name": "Management",
+      "total": 380,
+      "dropout_count": 134,
+      "graduate_count": 138,
+      "enrolled_count": 108,
+      "dropout_rate": 0.3526,
+      "graduate_rate": 0.3632
+    },
+    {
+      "course_id": 9238,
+      "course_name": "Social Service (Day)",
+      "total": 355,
+      "dropout_count": 65,
+      "graduate_count": 248,
+      "enrolled_count": 42,
+      "dropout_rate": 0.1831,
+      "graduate_rate": 0.6986
+    },
+    {
+      "course_id": 9085,
+      "course_name": "Veterinary Nursing",
+      "total": 337,
+      "dropout_count": 90,
+      "graduate_count": 172,
+      "enrolled_count": 75,
+      "dropout_rate": 0.2671,
+      "graduate_rate": 0.5104
+    },
+    {
+      "course_id": 9773,
+      "course_name": "Journalism & Communication",
+      "total": 331,
+      "dropout_count": 101,
+      "graduate_count": 196,
+      "enrolled_count": 34,
+      "dropout_rate": 0.3051,
+      "graduate_rate": 0.5921
+    },
+    {
+      "course_id": 9670,
+      "course_name": "Advertising & Marketing",
+      "total": 268,
+      "dropout_count": 95,
+      "graduate_count": 125,
+      "enrolled_count": 48,
+      "dropout_rate": 0.3545,
+      "graduate_rate": 0.4664
+    },
+    {
+      "course_id": 9991,
+      "course_name": "Management (Evening)",
+      "total": 268,
+      "dropout_count": 136,
+      "graduate_count": 78,
+      "enrolled_count": 54,
+      "dropout_rate": 0.5075,
+      "graduate_rate": 0.291
+    },
+    {
+      "course_id": 9254,
+      "course_name": "Tourism",
+      "total": 252,
+      "dropout_count": 96,
+      "graduate_count": 115,
+      "enrolled_count": 41,
+      "dropout_rate": 0.381,
+      "graduate_rate": 0.4563
+    },
+    {
+      "course_id": 9070,
+      "course_name": "Communication Design",
+      "total": 226,
+      "dropout_count": 51,
+      "graduate_count": 133,
+      "enrolled_count": 42,
+      "dropout_rate": 0.2257,
+      "graduate_rate": 0.5885
+    },
+    {
+      "course_id": 171,
+      "course_name": "Animation and Multimedia Design",
+      "total": 215,
+      "dropout_count": 82,
+      "graduate_count": 96,
+      "enrolled_count": 37,
+      "dropout_rate": 0.3814,
+      "graduate_rate": 0.4465
+    },
+    {
+      "course_id": 8014,
+      "course_name": "Social Service (Evening)",
+      "total": 215,
+      "dropout_count": 71,
+      "graduate_count": 123,
+      "enrolled_count": 21,
+      "dropout_rate": 0.3302,
+      "graduate_rate": 0.5721
+    },
+    {
+      "course_id": 9003,
+      "course_name": "Agronomy",
+      "total": 210,
+      "dropout_count": 86,
+      "graduate_count": 87,
+      "enrolled_count": 37,
+      "dropout_rate": 0.4095,
+      "graduate_rate": 0.4143
+    },
+    {
+      "course_id": 9853,
+      "course_name": "Basic Education",
+      "total": 192,
+      "dropout_count": 85,
+      "graduate_count": 57,
+      "enrolled_count": 50,
+      "dropout_rate": 0.4427,
+      "graduate_rate": 0.2969
+    },
+    {
+      "course_id": 9119,
+      "course_name": "Informatics Engineering",
+      "total": 170,
+      "dropout_count": 92,
+      "graduate_count": 14,
+      "enrolled_count": 64,
+      "dropout_rate": 0.5412,
+      "graduate_rate": 0.0824
+    },
+    {
+      "course_id": 9130,
+      "course_name": "Equiniculture",
+      "total": 141,
+      "dropout_count": 78,
+      "graduate_count": 42,
+      "enrolled_count": 21,
+      "dropout_rate": 0.5532,
+      "graduate_rate": 0.2979
+    },
+    {
+      "course_id": 9556,
+      "course_name": "Oral Hygiene",
+      "total": 86,
+      "dropout_count": 33,
+      "graduate_count": 36,
+      "enrolled_count": 17,
+      "dropout_rate": 0.3837,
+      "graduate_rate": 0.4186
+    },
+    {
+      "course_id": 33,
+      "course_name": "Biofuel Production Technologies",
+      "total": 12,
+      "dropout_count": 8,
+      "graduate_count": 1,
+      "enrolled_count": 3,
+      "dropout_rate": 0.6667,
+      "graduate_rate": 0.0833
+    }
+  ],
+  "financial_stats": {
+    "tuition_up_to_date": {
+      "paid": {
+        "total": 3896,
+        "dropout_rate": 0.2474
+      },
+      "unpaid": {
+        "total": 528,
+        "dropout_rate": 0.8655
+      }
+    },
+    "debtor": {
+      "yes": {
+        "total": 503,
+        "dropout_rate": 0.6203
+      },
+      "no": {
+        "total": 3921,
+        "dropout_rate": 0.2828
+      }
+    },
+    "scholarship": {
+      "yes": {
+        "total": 1099,
+        "dropout_rate": 0.1219
+      },
+      "no": {
+        "total": 3325,
+        "dropout_rate": 0.3871
+      }
+    }
+  },
+  "grade_dist": {
+    "Dropout": {
+      "mean": 7.26,
+      "median": 10.93,
+      "std": 6.03,
+      "min": 0.0,
+      "max": 18.0,
+      "q25": 0.0,
+      "q75": 12.2
+    },
+    "Enrolled": {
+      "mean": 11.13,
+      "median": 12.0,
+      "std": 3.68,
+      "min": 0.0,
+      "max": 17.0,
+      "q25": 11.0,
+      "q75": 12.86
+    },
+    "Graduate": {
+      "mean": 12.64,
+      "median": 13.0,
+      "std": 2.7,
+      "min": 0.0,
+      "max": 18.88,
+      "q25": 12.12,
+      "q75": 13.86
+    }
+  },
+  "feature_importance": [
+    {
+      "feature": "first_sem_approval_rate",
+      "importance": 0.2041
+    },
+    {
+      "feature": "first_sem_grade",
+      "importance": 0.1525
+    },
+    {
+      "feature": "admission_grade",
+      "importance": 0.0772
+    },
+    {
+      "feature": "previous_qualification_grade",
+      "importance": 0.0692
+    },
+    {
+      "feature": "age_at_enrollment",
+      "importance": 0.0683
+    },
+    {
+      "feature": "tuition_up_to_date",
+      "importance": 0.0677
+    },
+    {
+      "feature": "course",
+      "importance": 0.0627
+    },
+    {
+      "feature": "gdp",
+      "importance": 0.0468
+    },
+    {
+      "feature": "unemployment_rate",
+      "importance": 0.0428
+    },
+    {
+      "feature": "application_mode",
+      "importance": 0.0395
+    },
+    {
+      "feature": "mother_qualification",
+      "importance": 0.0371
+    },
+    {
+      "feature": "father_qualification",
+      "importance": 0.0367
+    },
+    {
+      "feature": "scholarship_holder",
+      "importance": 0.0313
+    },
+    {
+      "feature": "gender",
+      "importance": 0.0186
+    },
+    {
+      "feature": "debtor",
+      "importance": 0.0185
+    },
+    {
+      "feature": "displaced",
+      "importance": 0.0135
+    },
+    {
+      "feature": "marital_status",
+      "importance": 0.0075
+    },
+    {
+      "feature": "attendance_type",
+      "importance": 0.0059
+    }
+  ]
+}

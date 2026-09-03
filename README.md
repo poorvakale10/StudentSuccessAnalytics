@@ -1,61 +1,76 @@
-# Student Success Analytics - Early Warning & Academic Risk Intelligence
+# DropoutSense — Student Dropout Risk Predictor
 
-A modern SaaS analytics web platform and machine learning decision-support tool for identifying higher education students at risk of academic dropout at the end of their first semester.
-
----
-
-## 📌 Project Overview
-Higher education institutions face significant challenges with student attrition. This system leverages classical machine learning models trained on student background demographics, socioeconomic factors, admission qualifications, and **first-semester academic performance** to estimate student outcome probabilities (`Graduate`, `Dropout`, `Enrolled`).
+DropoutSense is a full-stack web application designed to predict student dropout risk and provide actionable, SHAP-explained insights using classical machine learning trained on the UCI "Predict Students' Dropout and Academic Success" dataset.
 
 ---
 
-## 🏆 Key Machine Learning Highlights
+## 🚀 System Features
 
-- **Dataset:** UCI Predict Students' Dropout and Academic Success (`4,424` student records).
-- **Target Outcome Classes:** 
-  - `Graduate`: 2,209 (49.93%)
-  - `Dropout`: 1,421 (32.12%)
-  - `Enrolled`: 794 (17.95%)
-- **Selected Model:** **Random Forest (Balanced)**
-- **Primary Selection Metric:** **Macro F1 = 0.6898** (Chosen over accuracy due to multiclass imbalance).
-- **Overall Model Accuracy:** **73.90%**
-- **Multiclass ROC-AUC:** **0.8650**
-- **Strict Data Leakage Guard:** Excludes all 6 second-semester features (`Curricular units 2nd sem...`) to preserve realistic early warning capability at the end of the first semester.
+- **18 Curated Feature Signals**: Curated from the original 36-column UCI dataset across Academic, Financial, Demographic, Family, and Macroeconomic categories.
+- **Engineered Academic Signals**: Raw per-unit breakdowns consolidated into 1st Semester Average Grade & Approval Rate (`approved / enrolled`).
+- **Multiclass ML Engine**: Trains and compares **Logistic Regression, Random Forest, XGBoost, and Support Vector Machines (SVM)**. Winning model: **Random Forest** (**71.5% Accuracy**, **0.6681 Macro F1**).
+- **SHAP Explainability**: Natural language explanation cards highlighting top positive and negative contributing factors for every prediction.
+- **Interactive Dark-Themed Frontend**: Built with React, Tailwind CSS v4, and Recharts. Includes Landing page animated stat counters, filterable analytics dashboard, multi-step risk prediction form with instant profile presets, and model benchmark comparisons.
 
 ---
 
-## 🛠️ Technology Stack
-- **Language:** Python 3.14
-- **Data & ML Pipelines:** Pandas, NumPy, Scikit-learn, XGBoost, Joblib
-- **Interactive Visualizations:** Plotly, Matplotlib, Seaborn
-- **Web Application Framework:** Streamlit
+## 🛠️ Architecture & Tech Stack
 
----
+- **Backend**: Python 3.14, FastAPI, Scikit-learn, XGBoost, SHAP, Pydantic, Uvicorn.
+- **Frontend**: React 19, Vite, Tailwind CSS v4, Recharts, Lucide Icons.
 
-## 🚀 Quickstart Guide
-
-### 1. Clone Repository
-```bash
-git clone https://github.com/poorvakale10/StudentSuccessAnalytics.git
-cd StudentSuccessAnalytics
+```
+DropoutSense/
+├── backend/
+│   ├── main.py              # FastAPI server (predict, metrics, dataset-insights)
+│   ├── schemas.py           # Pydantic request/response validation schemas
+│   ├── artifacts/           # Trained models, metrics JSON, dataset insights
+│   └── ml/
+│       └── train_model.py   # Machine learning training & evaluation pipeline
+├── frontend/                # Vite + React + Tailwind CSS web application
+│   ├── src/
+│   │   ├── components/      # Navbar, Landing, Dashboard, Risk Predictor, Performance
+│   │   ├── App.jsx
+│   │   └── index.css
+│   ├── package.json
+│   └── vite.config.js
+└── data/
+    └── data.csv             # UCI Student Dataset (4,424 records)
 ```
 
-### 2. Install Dependencies
+---
+
+## 💻 Quickstart
+
+### 1. Install Backend Dependencies & Train ML Models
 ```bash
 pip install -r requirements.txt
+python backend/ml/train_model.py
 ```
 
-### 3. Launch Streamlit Dashboard
+### 2. Launch FastAPI Backend Server
 ```bash
-streamlit run app.py
+python -m uvicorn backend.main:app --port 8000 --reload
 ```
+API Documentation available at: `http://127.0.0.1:8000/docs`
 
-Open `http://localhost:8501` in your browser.
+### 3. Launch React Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Open `http://localhost:5173/` in your browser.
 
 ---
 
-## 👥 Project Team
-- **Atharva Damale** — 23102C0004
-- **Poorva Kale** — 23102C0015
-- **Shreya Sathish** — 23102C0019
-- **Raj Yadav** — 23102C0031
+## 📊 REST API Endpoints
+
+- `POST /api/predict`: Evaluates 18 feature inputs -> returns predicted target class (`Dropout`, `Enrolled`, `Graduate`), confidence gauge, risk tier (`High`, `Medium`, `Low`), SHAP factors, and advisor next steps.
+- `GET /api/model-metrics`: Model benchmark comparison statistics across LR, RF, XGB, SVM, and confusion matrix.
+- `GET /api/dataset-insights`: Aggregate stats for dashboard visualizations (course dropout rates, financial status impact, grade distributions).
+
+---
+
+## 📜 License
+MIT License
