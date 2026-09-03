@@ -216,105 +216,107 @@
   },
   "grade_dist": {
     "Dropout": {
-      "mean": 7.26,
-      "median": 10.93,
-      "std": 6.03,
-      "min": 0.0,
-      "max": 18.0,
-      "q25": 0.0,
-      "q75": 12.2
+      "mean": 8.5
     },
     "Enrolled": {
-      "mean": 11.13,
-      "median": 12.0,
-      "std": 3.68,
-      "min": 0.0,
-      "max": 17.0,
-      "q25": 11.0,
-      "q75": 12.86
+      "mean": 11.2
     },
     "Graduate": {
-      "mean": 12.64,
-      "median": 13.0,
-      "std": 2.7,
-      "min": 0.0,
-      "max": 18.88,
-      "q25": 12.12,
-      "q75": 13.86
+      "mean": 14.8
     }
   },
   "feature_importance": [
     {
-      "feature": "first_sem_approval_rate",
-      "importance": 0.2041
+      "feature": "motivation_level",
+      "importance": 1.7191
     },
     {
-      "feature": "first_sem_grade",
-      "importance": 0.1525
+      "feature": "social_support",
+      "importance": 1.5911
     },
     {
-      "feature": "admission_grade",
-      "importance": 0.0772
+      "feature": "academic_satisfaction",
+      "importance": 1.5629
     },
     {
-      "feature": "previous_qualification_grade",
-      "importance": 0.0692
+      "feature": "study_life_balance",
+      "importance": 1.5537
     },
     {
-      "feature": "age_at_enrollment",
-      "importance": 0.0683
+      "feature": "anxiety_level",
+      "importance": 1.4784
+    },
+    {
+      "feature": "stress_level",
+      "importance": 1.4371
+    },
+    {
+      "feature": "sleep_quality",
+      "importance": 1.4177
+    },
+    {
+      "feature": "courses_failed",
+      "importance": 0.3954
     },
     {
       "feature": "tuition_up_to_date",
-      "importance": 0.0677
+      "importance": 0.3245
     },
     {
-      "feature": "course",
-      "importance": 0.0627
+      "feature": "courses_approved",
+      "importance": 0.23
     },
     {
-      "feature": "gdp",
-      "importance": 0.0468
-    },
-    {
-      "feature": "unemployment_rate",
-      "importance": 0.0428
-    },
-    {
-      "feature": "application_mode",
-      "importance": 0.0395
-    },
-    {
-      "feature": "mother_qualification",
-      "importance": 0.0371
-    },
-    {
-      "feature": "father_qualification",
-      "importance": 0.0367
+      "feature": "evaluation_participation_pct",
+      "importance": 0.1623
     },
     {
       "feature": "scholarship_holder",
-      "importance": 0.0313
+      "importance": 0.1603
     },
     {
-      "feature": "gender",
-      "importance": 0.0186
+      "feature": "current_sem_gpa",
+      "importance": 0.1323
     },
     {
       "feature": "debtor",
-      "importance": 0.0185
+      "importance": 0.1006
+    },
+    {
+      "feature": "gender",
+      "importance": 0.0689
+    },
+    {
+      "feature": "twelfth_grade_pct",
+      "importance": 0.0641
+    },
+    {
+      "feature": "attendance_pct",
+      "importance": 0.0619
+    },
+    {
+      "feature": "cgpa",
+      "importance": 0.0613
+    },
+    {
+      "feature": "assignment_submission_pct",
+      "importance": 0.0578
+    },
+    {
+      "feature": "courses_enrolled",
+      "importance": 0.052
+    },
+    {
+      "feature": "age_at_enrollment",
+      "importance": 0.0506
+    },
+    {
+      "feature": "tenth_grade_pct",
+      "importance": 0.0254
     },
     {
       "feature": "displaced",
-      "importance": 0.0135
-    },
-    {
-      "feature": "marital_status",
-      "importance": 0.0075
-    },
-    {
-      "feature": "attendance_type",
-      "importance": 0.0059
+      "importance": 0.0178
     }
   ]
 }

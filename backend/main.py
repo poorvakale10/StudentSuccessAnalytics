@@ -9,8 +9,8 @@ from backend.schemas import StudentFeatureInput, PredictionResponse, FactorExpla
 
 app = FastAPI(
     title="DropoutSense API",
-    description="Student Dropout Risk Predictor backend API using UCI dataset machine learning model and SHAP explainability.",
-    version="1.0.0"
+    description="Student Dropout Risk Predictor backend API using machine learning model, sub-risk scoring (Academic, Wellbeing, Financial), and SHAP explainability.",
+    version="2.0.0"
 )
 
 app.add_middleware(
@@ -31,44 +31,29 @@ metrics_data = None
 insights_data = None
 
 FEATURE_LABELS = {
-    'previous_qualification_grade': "10th & 12th Grade Marks",
-    'admission_grade': "Admission Score",
-    'first_sem_grade': "GPA & Aggregate CGPA",
-    'first_sem_approval_rate': "1st Sem Approval Rate",
-    'attendance_type': "Attendance Mode",
-    'debtor': "Debtor Status",
-    'tuition_up_to_date': "Tuition Fees Status",
-    'scholarship_holder': "Scholarship Status",
-    'age_at_enrollment': "Age at Enrollment",
-    'gender': "Gender",
-    'marital_status': "Marital Status",
-    'displaced': "Displaced Status",
-    'mother_qualification': "Mother's Qualification",
-    'father_qualification': "Father's Qualification",
-    'application_mode': "Application Mode",
-    'course': "Course",
-    'unemployment_rate': "Unemployment Rate",
-    'gdp': "GDP Rate"
-}
-
-COURSE_MAP = {
-    33: "Biofuel Production Technologies",
-    171: "Animation and Multimedia Design",
-    8014: "Social Service (Evening)",
-    9003: "Agronomy",
-    9070: "Communication Design",
-    9085: "Veterinary Nursing",
-    9119: "Informatics Engineering",
-    9130: "Equiniculture",
-    9147: "Management",
-    9238: "Social Service (Day)",
-    9254: "Tourism",
-    9500: "Nursing",
-    9556: "Oral Hygiene",
-    9670: "Advertising & Marketing",
-    9773: "Journalism & Communication",
-    9853: "Basic Education",
-    9991: "Management (Evening)"
+    'tenth_grade_pct': '10th Grade Marks (%)',
+    'twelfth_grade_pct': '12th Grade Marks (%)',
+    'current_sem_gpa': 'Current Semester GPA',
+    'cgpa': 'Aggregate CGPA',
+    'courses_enrolled': 'Enrolled Courses',
+    'courses_approved': 'Approved Courses',
+    'courses_failed': 'Failed Courses',
+    'attendance_pct': 'Attendance (%)',
+    'evaluation_participation_pct': 'Evaluation Participation (%)',
+    'assignment_submission_pct': 'Assignment Submission (%)',
+    'stress_level': 'Stress Level (1-5)',
+    'anxiety_level': 'Anxiety Level (1-5)',
+    'sleep_quality': 'Sleep Quality (1-5)',
+    'motivation_level': 'Motivation Level (1-5)',
+    'academic_satisfaction': 'Academic Satisfaction (1-5)',
+    'social_support': 'Social Support (1-5)',
+    'study_life_balance': 'Study-Life Balance (1-5)',
+    'debtor': 'Debtor Status',
+    'tuition_up_to_date': 'Tuition Status',
+    'scholarship_holder': 'Scholarship Status',
+    'age_at_enrollment': 'Age at Enrollment',
+    'gender': 'Gender',
+    'displaced': 'Displaced Status'
 }
 
 @app.on_event("startup")
@@ -111,61 +96,66 @@ def get_dataset_insights():
         raise HTTPException(status_code=500, detail="Dataset insights not loaded.")
     return insights_data
 
-def format_feature_explanation(feat: str, val: Any, shap_val: float) -> str:
+def format_explanation(feat: str, val: Any, shap_val: float) -> str:
     lbl = FEATURE_LABELS.get(feat, feat)
     
-    if feat == 'first_sem_approval_rate':
-        pct = int(val * 100) if isinstance(val, (int, float)) else val
-        if shap_val > 0:
-            return f"Low approval rate ({pct}%) in 1st semester courses significantly raises dropout risk."
+    if feat == 'courses_failed':
+        if val > 0:
+            return f"Failed {val} course(s), which directly escalates academic risk profile."
         else:
-            return f"Strong course completion rate ({pct}%) in 1st semester reinforces academic persistence."
+            return "Zero course failures, maintaining clean academic completion record."
 
-    elif feat == 'first_sem_grade':
-        if shap_val > 0:
-            return f"Current semester GPA and CGPA profile ({val:.1f}/20 equivalent) falls below target stability."
+    elif feat == 'assignment_submission_pct':
+        if val < 70:
+            return f"Low assignment submission rate ({val}%) indicates academic disengagement."
         else:
-            return f"High semester GPA and CGPA ({val:.1f}/20 equivalent) acts as a strong protective academic factor."
+            return f"High assignment submission rate ({val}%) demonstrates strong continuous evaluation effort."
 
-    elif feat == 'previous_qualification_grade':
-        if shap_val > 0:
-            return f"10th & 12th grade percentage foundation ({val/2.0:.1f}%) contributes to risk profile."
+    elif feat == 'attendance_pct':
+        if val < 75:
+            return f"Class attendance ({val}%) is below mandatory academic participation benchmark."
         else:
-            return f"Solid 10th & 12th grade percentage foundation ({val/2.0:.1f}%) supports learning readiness."
+            return f"Consistent class attendance ({val}%) supports learning continuity."
+
+    elif feat == 'stress_level':
+        if val >= 4:
+            return f"Elevated stress level ({val}/5) creates acute psychological pressure."
+        else:
+            return f"Low/Manageable stress rating ({val}/5) supports mental wellness."
+
+    elif feat == 'anxiety_level':
+        if val >= 4:
+            return f"High anxiety rating ({val}/5) impacts exam performance and focus."
+        else:
+            return f"Low anxiety score ({val}/5) aids cognitive focus."
+
+    elif feat == 'sleep_quality':
+        if val <= 2:
+            return f"Poor sleep quality rating ({val}/5) contributes to fatigue and burnout."
+        else:
+            return f"Good sleep quality rating ({val}/5) provides cognitive restoration."
+
+    elif feat == 'motivation_level':
+        if val <= 2:
+            return f"Low motivation score ({val}/5) signals disinterest or loss of direction."
+        else:
+            return f"Strong motivation rating ({val}/5) drives academic goal commitment."
 
     elif feat == 'tuition_up_to_date':
-        if val == 0 or val == "No":
-            return "Tuition fees are overdue, creating immediate financial risk of administrative drop."
+        if val == 0:
+            return "Tuition fees are overdue, creating immediate financial hold risk."
         else:
             return "Tuition payments are up to date, eliminating administrative financial hold."
 
     elif feat == 'debtor':
-        if val == 1 or val == "Yes":
-            return "Student is flagged as a debtor with outstanding institutional balances."
+        if val == 1:
+            return "Student is flagged as a debtor with outstanding financial balances."
         else:
             return "Student has no outstanding debt with the institution."
 
-    elif feat == 'scholarship_holder':
-        if val == 1 or val == "Yes":
-            return "Scholarship funding provides crucial financial stability and lowers risk."
-        else:
-            return "Lack of scholarship grant means higher self-funded financial burden."
-
-    elif feat == 'age_at_enrollment':
-        if isinstance(val, (int, float)) and val > 24:
-            return f"Age at enrollment ({val} years) is higher than traditional student entry age."
-        else:
-            return f"Enrollment at age {val} aligns with traditional academic progression."
-
-    elif feat == 'displaced':
-        if val == 1 or val == "Yes":
-            return "Living away from home may introduce social dislocation or housing stress."
-        else:
-            return "Living locally provides family and community proximity."
-
     else:
         direction = "increases" if shap_val > 0 else "decreases"
-        return f"{lbl} (value: {val}) {direction} overall dropout probability."
+        return f"{lbl} ({val}) {direction} overall dropout probability."
 
 @app.post("/api/predict", response_model=PredictionResponse)
 def predict_student_risk(input_data: StudentFeatureInput):
@@ -179,45 +169,37 @@ def predict_student_risk(input_data: StudentFeatureInput):
     target_names = artifacts['target_names']
     explainer = artifacts['explainer']
 
-    # Map user-friendly 10th%, 12th%, Current Sem GPA, CGPA to 18 ML model features
-    prev_qual_grade = input_data.previous_qualification_grade
-    if prev_qual_grade is None:
-        avg_pct = (input_data.tenth_grade_pct + input_data.twelfth_grade_pct) / 2.0
-        prev_qual_grade = avg_pct * 2.0  # Scale 0-100% to 0-200
-
-    first_sem_g = input_data.first_sem_grade
-    if first_sem_g is None:
-        avg_gpa = (input_data.current_sem_gpa + input_data.cgpa) / 2.0
-        first_sem_g = avg_gpa * 2.0  # Scale 0-10 GPA to 0-20
-
-    att_type = input_data.attendance_type if input_data.attendance_type is not None else 1
-
     feature_dict = {
-        'previous_qualification_grade': float(prev_qual_grade),
-        'admission_grade': float(input_data.twelfth_grade_pct * 2.0),
-        'first_sem_grade': float(first_sem_g),
-        'first_sem_approval_rate': float(input_data.first_sem_approval_rate),
-        'attendance_type': int(att_type),
+        'tenth_grade_pct': float(input_data.tenth_grade_pct),
+        'twelfth_grade_pct': float(input_data.twelfth_grade_pct),
+        'current_sem_gpa': float(input_data.current_sem_gpa),
+        'cgpa': float(input_data.cgpa),
+        'courses_enrolled': int(input_data.courses_enrolled),
+        'courses_approved': int(input_data.courses_approved),
+        'courses_failed': int(input_data.courses_failed),
+        'attendance_pct': float(input_data.attendance_pct),
+        'evaluation_participation_pct': float(input_data.evaluation_participation_pct),
+        'assignment_submission_pct': float(input_data.assignment_submission_pct),
+        'stress_level': int(input_data.stress_level),
+        'anxiety_level': int(input_data.anxiety_level),
+        'sleep_quality': int(input_data.sleep_quality),
+        'motivation_level': int(input_data.motivation_level),
+        'academic_satisfaction': int(input_data.academic_satisfaction),
+        'social_support': int(input_data.social_support),
+        'study_life_balance': int(input_data.study_life_balance),
         'debtor': int(input_data.debtor),
         'tuition_up_to_date': int(input_data.tuition_up_to_date),
         'scholarship_holder': int(input_data.scholarship_holder),
         'age_at_enrollment': int(input_data.age_at_enrollment),
         'gender': int(input_data.gender),
-        'marital_status': int(input_data.marital_status),
-        'displaced': int(input_data.displaced),
-        'mother_qualification': int(input_data.mother_qualification or 1),
-        'father_qualification': int(input_data.father_qualification or 1),
-        'application_mode': int(input_data.application_mode or 1),
-        'course': int(input_data.course or 9254),
-        'unemployment_rate': float(input_data.unemployment_rate or 10.8),
-        'gdp': float(input_data.gdp or 1.74)
+        'displaced': int(input_data.displaced)
     }
 
     df_single = pd.DataFrame([feature_dict])[feature_names]
 
-    # Predict probabilities
+    # Predict Probabilities using ML model
     if best_model_name in ['Logistic Regression', 'SVM']:
-        df_scaled = scaler.transform(df_single)
+        df_scaled = pd.DataFrame(scaler.transform(df_single), columns=feature_names)
         probs = best_model.predict_proba(df_scaled)[0]
     else:
         probs = best_model.predict_proba(df_single)[0]
@@ -230,6 +212,7 @@ def predict_student_risk(input_data: StudentFeatureInput):
 
     dropout_prob = prob_dict['Dropout']
     enrolled_prob = prob_dict['Enrolled']
+    overall_dropout_pct = int(round(dropout_prob * 100))
 
     pred_idx = int(np.argmax(probs))
     predicted_class = target_names[pred_idx]
@@ -240,6 +223,30 @@ def predict_student_risk(input_data: StudentFeatureInput):
         risk_tier = 'Medium'
     else:
         risk_tier = 'Low'
+
+    # Compute Normalized Sub-Risk Scores (0 - 100)
+    enrolled_cnt = max(1, input_data.courses_enrolled)
+    fail_factor = min(1.0, input_data.courses_failed / enrolled_cnt)
+    approval_factor = 1.0 - (input_data.courses_approved / enrolled_cnt)
+    gpa_factor = 1.0 - (input_data.current_sem_gpa / 10.0)
+    assign_factor = 1.0 - (input_data.assignment_submission_pct / 100.0)
+    acad_risk_raw = (fail_factor * 0.35 + approval_factor * 0.35 + gpa_factor * 0.15 + assign_factor * 0.15) * 100
+    academic_risk_score = int(np.clip(round(acad_risk_raw), 0, 100))
+
+    stress_w = (input_data.stress_level - 1) / 4.0
+    anxiety_w = (input_data.anxiety_level - 1) / 4.0
+    sleep_w = 1.0 - (input_data.sleep_quality - 1) / 4.0
+    motivation_w = 1.0 - (input_data.motivation_level - 1) / 4.0
+    satisfaction_w = 1.0 - (input_data.academic_satisfaction - 1) / 4.0
+    support_w = 1.0 - (input_data.social_support - 1) / 4.0
+    balance_w = 1.0 - (input_data.study_life_balance - 1) / 4.0
+    well_risk_raw = (stress_w * 0.20 + anxiety_w * 0.20 + sleep_w * 0.15 + motivation_w * 0.15 + satisfaction_w * 0.10 + support_w * 0.10 + balance_w * 0.10) * 100
+    wellbeing_risk_score = int(np.clip(round(well_risk_raw), 0, 100))
+
+    tuition_f = 0.50 if input_data.tuition_up_to_date == 0 else 0.0
+    debtor_f = 0.35 if input_data.debtor == 1 else 0.0
+    scholarship_f = 0.15 if input_data.scholarship_holder == 0 else 0.0
+    financial_risk_score = int(np.clip(round((tuition_f + debtor_f + scholarship_f) * 100), 0, 100))
 
     # SHAP Explainability
     try:
@@ -274,15 +281,13 @@ def predict_student_risk(input_data: StudentFeatureInput):
         s_val = float(shap_class0[idx])
 
         effect = "Increases Dropout Risk" if s_val > 0 else "Decreases Dropout Risk"
-        explanation_text = format_feature_explanation(feat, val, s_val)
+        explanation_text = format_explanation(feat, val, s_val)
 
         val_display = val
-        if feat == 'first_sem_approval_rate':
-            val_display = f"{int(val * 100)}%"
-        elif feat == 'first_sem_grade':
-            val_display = f"GPA {input_data.current_sem_gpa}/10 | CGPA {input_data.cgpa}/10"
-        elif feat == 'previous_qualification_grade':
-            val_display = f"10th: {input_data.tenth_grade_pct}% | 12th: {input_data.twelfth_grade_pct}%"
+        if feat in ['attendance_pct', 'evaluation_participation_pct', 'assignment_submission_pct', 'tenth_grade_pct', 'twelfth_grade_pct']:
+            val_display = f"{val}%"
+        elif feat in ['stress_level', 'anxiety_level', 'sleep_quality', 'motivation_level', 'academic_satisfaction', 'social_support', 'study_life_balance']:
+            val_display = f"{val} / 5"
         elif feat in ['debtor', 'tuition_up_to_date', 'scholarship_holder', 'displaced', 'gender']:
             val_display = "Yes" if val == 1 else "No"
             if feat == 'gender':
@@ -297,38 +302,18 @@ def predict_student_risk(input_data: StudentFeatureInput):
             explanation=explanation_text
         ))
 
-    # Add Mental Health & Lifestyle factor explanation if high stress or low sleep
-    if input_data.stress_level >= 7:
-        top_factors.append(FactorExplanation(
-            feature="stress_level",
-            label="Perceived Stress Level",
-            value=f"{input_data.stress_level} / 10",
-            shap_value=0.035,
-            effect="Increases Dropout Risk",
-            explanation=f"High reported stress level ({input_data.stress_level}/10) places emotional pressure on academic persistence."
-        ))
-
     recommendations = []
-    if input_data.stress_level >= 7:
-        recommendations.append("Refer student to Student Wellness & Psychological Counseling Services for stress management.")
-
-    if input_data.sleep_hours < 6.0:
-        recommendations.append("Provide sleep hygiene and wellness guidance to reduce fatigue-related academic burnout.")
-
-    if input_data.screen_time_hours > 7.0:
-        recommendations.append("Recommend digital detox and structured study-life balance workshops.")
-
-    if input_data.tuition_up_to_date == 0 or input_data.debtor == 1:
-        recommendations.append("Connect student with Student Financial Services for emergency micro-grants or tuition payment deferral plans.")
+    if academic_risk_score > 50:
+        recommendations.append("Assign an academic peer tutor and schedule mandatory course remediation counseling.")
     
-    if input_data.first_sem_approval_rate < 0.6 or input_data.current_sem_gpa < 6.0:
-        recommendations.append("Assign an academic peer tutor and schedule mandatory bi-weekly academic progress reviews.")
+    if wellbeing_risk_score > 50:
+        recommendations.append("Refer student to Student Psychological Counseling Services for stress, anxiety, and burnout support.")
 
-    if input_data.displaced == 1 and risk_tier in ['High', 'Medium']:
-        recommendations.append("Provide campus housing and social integration advisory support to mitigate student dislocation.")
+    if financial_risk_score > 40:
+        recommendations.append("Connect student with Financial Aid Office for emergency micro-grants or flexible fee installment plans.")
 
-    if risk_tier == 'High' and len(recommendations) < 3:
-        recommendations.append("Schedule an urgent 1-on-1 counselor intervention within 5 business days.")
+    if input_data.attendance_pct < 75.0:
+        recommendations.append("Provide attendance monitoring and outreach through student success advisors.")
 
     if risk_tier == 'Low' and len(recommendations) == 0:
         recommendations.append("Recommend student for peer mentorship opportunities and undergraduate research programs.")
@@ -337,6 +322,10 @@ def predict_student_risk(input_data: StudentFeatureInput):
         predicted_class=predicted_class,
         probabilities=prob_dict,
         risk_tier=risk_tier,
-        top_factors=top_factors[:5],
+        academic_risk_score=academic_risk_score,
+        wellbeing_risk_score=wellbeing_risk_score,
+        financial_risk_score=financial_risk_score,
+        overall_dropout_prob_pct=overall_dropout_pct,
+        top_factors=top_factors,
         recommendations=recommendations
     )

@@ -1,76 +1,97 @@
 import React, { useState } from 'react';
 import { 
-  Calculator, CheckCircle, AlertTriangle, ShieldAlert, ChevronRight, ChevronLeft, Sparkles, RefreshCw, Award, ArrowUpRight, ArrowDownRight, Info, UserCheck, AlertOctagon, HeartPulse, Brain, Moon, Clock, Monitor
+  Calculator, CheckCircle, AlertTriangle, ShieldAlert, ChevronRight, ChevronLeft, Sparkles, RefreshCw, Award, ArrowUpRight, ArrowDownRight, Info, UserCheck, AlertOctagon, HeartPulse, Brain, Moon, Clock, Monitor, BookOpen, Smile, DollarSign, Activity
 } from 'lucide-react';
 
 const PRESETS = {
   highRisk: {
     name: "High Dropout Risk Profile",
     icon: "🔴",
-    description: "55% 10th, 50% 12th, 4.2 GPA, Overdue tuition, Debtor, 9/10 Stress",
+    description: "3 Courses Failed, 4.2 GPA, 55% Attendance, 5/5 Stress & Anxiety, Overdue Tuition",
     values: {
       tenth_grade_pct: 55.0,
       twelfth_grade_pct: 50.0,
       current_sem_gpa: 4.2,
       cgpa: 4.5,
-      first_sem_approval_rate: 0.20,
+      courses_enrolled: 6,
+      courses_approved: 3,
+      courses_failed: 3,
+      attendance_pct: 55.0,
+      evaluation_participation_pct: 50.0,
+      assignment_submission_pct: 45.0,
+      stress_level: 5,
+      anxiety_level: 5,
+      sleep_quality: 1,
+      motivation_level: 1,
+      academic_satisfaction: 1,
+      social_support: 1,
+      study_life_balance: 1,
       debtor: 1,
       tuition_up_to_date: 0,
       scholarship_holder: 0,
       age_at_enrollment: 24,
       gender: 1,
-      marital_status: 1,
-      displaced: 1,
-      stress_level: 9,
-      screen_time_hours: 9.0,
-      sleep_hours: 4.5,
-      study_hours: 8.0
+      displaced: 1
     }
   },
   graduate: {
     name: "High Performing Graduate Profile",
     icon: "🟢",
-    description: "88% 10th, 85% 12th, 8.8 GPA, Paid tuition, Scholarship, 3/10 Stress",
+    description: "0 Courses Failed, 8.8 GPA, 95% Attendance, 1/5 Stress, Paid Tuition, Scholarship",
     values: {
       tenth_grade_pct: 88.0,
       twelfth_grade_pct: 85.0,
       current_sem_gpa: 8.8,
       cgpa: 9.1,
-      first_sem_approval_rate: 1.0,
+      courses_enrolled: 6,
+      courses_approved: 6,
+      courses_failed: 0,
+      attendance_pct: 95.0,
+      evaluation_participation_pct: 92.0,
+      assignment_submission_pct: 98.0,
+      stress_level: 1,
+      anxiety_level: 1,
+      sleep_quality: 5,
+      motivation_level: 5,
+      academic_satisfaction: 5,
+      social_support: 5,
+      study_life_balance: 5,
       debtor: 0,
       tuition_up_to_date: 1,
       scholarship_holder: 1,
       age_at_enrollment: 19,
       gender: 0,
-      marital_status: 1,
-      displaced: 1,
-      stress_level: 3,
-      screen_time_hours: 3.5,
-      sleep_hours: 8.0,
-      study_hours: 25.0
+      displaced: 1
     }
   },
   borderline: {
     name: "Borderline Enrolled Profile",
     icon: "🟡",
-    description: "70% 10th, 65% 12th, 6.2 GPA, Paid tuition, No scholarship, 6/10 Stress",
+    description: "1 Course Failed, 6.2 GPA, 75% Attendance, 3/5 Stress & Anxiety, Paid Tuition",
     values: {
       tenth_grade_pct: 70.0,
       twelfth_grade_pct: 65.0,
       current_sem_gpa: 6.2,
       cgpa: 6.5,
-      first_sem_approval_rate: 0.50,
+      courses_enrolled: 6,
+      courses_approved: 5,
+      courses_failed: 1,
+      attendance_pct: 75.0,
+      evaluation_participation_pct: 70.0,
+      assignment_submission_pct: 72.0,
+      stress_level: 3,
+      anxiety_level: 3,
+      sleep_quality: 3,
+      motivation_level: 3,
+      academic_satisfaction: 3,
+      social_support: 3,
+      study_life_balance: 3,
       debtor: 0,
       tuition_up_to_date: 1,
       scholarship_holder: 0,
       age_at_enrollment: 21,
       gender: 1,
-      marital_status: 1,
-      displaced: 0,
-      stress_level: 6,
-      screen_time_hours: 5.5,
-      sleep_hours: 6.5,
-      study_hours: 14.0
+      displaced: 0
     }
   }
 };
@@ -83,25 +104,31 @@ export default function PredictPage({ showToast }) {
     twelfth_grade_pct: 72.0,
     current_sem_gpa: 7.5,
     cgpa: 7.8,
-    first_sem_approval_rate: 0.80,
+    courses_enrolled: 6,
+    courses_approved: 5,
+    courses_failed: 1,
+    attendance_pct: 85.0,
+    evaluation_participation_pct: 80.0,
+    assignment_submission_pct: 85.0,
+    stress_level: 3,
+    anxiety_level: 3,
+    sleep_quality: 3,
+    motivation_level: 3,
+    academic_satisfaction: 3,
+    social_support: 3,
+    study_life_balance: 3,
     debtor: 0,
     tuition_up_to_date: 1,
     scholarship_holder: 0,
     age_at_enrollment: 20,
     gender: 1,
-    marital_status: 1,
-    displaced: 1,
-    stress_level: 5,
-    screen_time_hours: 4.5,
-    sleep_hours: 7.0,
-    study_hours: 18.0
+    displaced: 1
   });
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
 
-  // Clamped handler to enforce min/max validation
   const handleChange = (field, rawVal, minVal = 0, maxVal = 100) => {
     let val = parseFloat(rawVal);
     if (isNaN(val)) val = minVal;
@@ -129,7 +156,7 @@ export default function PredictPage({ showToast }) {
       if (!res.ok) throw new Error('Prediction API call failed');
       const data = await res.json();
       setResult(data);
-      if (showToast) showToast(`Prediction calculated: ${data.predicted_class} (${data.risk_tier} Risk)`, 'success');
+      if (showToast) showToast(`Risk Evaluated: ${data.predicted_class} (Dropout Prob: ${data.overall_dropout_prob_pct}%)`, 'success');
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -141,8 +168,9 @@ export default function PredictPage({ showToast }) {
 
   const stepsInfo = [
     { num: 1, title: 'Academic Performance' },
-    { num: 2, title: 'Financial Status' },
-    { num: 3, title: 'Demographics & Wellbeing' },
+    { num: 2, title: 'Attendance & Participation' },
+    { num: 3, title: 'Wellbeing (1-5 Scale)' },
+    { num: 4, title: 'Financial & Demographics' },
   ];
 
   return (
@@ -153,14 +181,14 @@ export default function PredictPage({ showToast }) {
         <div>
           <h2 className="text-2xl font-extrabold text-white flex items-center gap-2">
             <Calculator className="w-6 h-6 text-indigo-400" />
-            <span>Student Risk Predictor & SHAP Explainer</span>
+            <span>Student Risk Predictor & Multi-Domain Assessment</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Input academic (10th%, 12th%, GPA, CGPA), financial, demographic & mental wellbeing signals to evaluate retention risk.
+            Input Academic, Participation, Wellbeing (1-5), and Financial signals to generate normalized Sub-Risk Scores & ML Dropout Forecast.
           </p>
         </div>
 
-        {/* Quick Presets */}
+        {/* Presets */}
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => applyPreset('highRisk')}
@@ -189,12 +217,12 @@ export default function PredictPage({ showToast }) {
         <div className="lg:col-span-7 bg-slate-900/80 p-6 sm:p-8 rounded-2xl border border-slate-800 space-y-6">
           
           {/* Stepper Navigation */}
-          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-4 overflow-x-auto gap-2">
             {stepsInfo.map((s) => (
               <button
                 key={s.num}
                 onClick={() => setStep(s.num)}
-                className={`flex items-center gap-2 text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap transition-all ${
                   step === s.num
                     ? 'text-indigo-400 scale-105'
                     : step > s.num
@@ -216,19 +244,16 @@ export default function PredictPage({ showToast }) {
             ))}
           </div>
 
-          {/* Form Content based on Active Step */}
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {/* Step 1: Academic Performance */}
             {step === 1 && (
               <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">1. Academic Marks & GPA Signals</h3>
+                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">1. Academic Performance Signals</h3>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
-                      10th Grade Marks (0 - 100%)
-                    </label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">10th Grade Marks (%)</label>
                     <input
                       type="number"
                       step="0.1"
@@ -237,14 +262,11 @@ export default function PredictPage({ showToast }) {
                       value={formData.tenth_grade_pct}
                       onChange={(e) => handleChange('tenth_grade_pct', e.target.value, 0, 100)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
-                      placeholder="e.g. 85.0"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
-                      12th Grade Marks (0 - 100%)
-                    </label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">12th Grade Marks (%)</label>
                     <input
                       type="number"
                       step="0.1"
@@ -253,14 +275,11 @@ export default function PredictPage({ showToast }) {
                       value={formData.twelfth_grade_pct}
                       onChange={(e) => handleChange('twelfth_grade_pct', e.target.value, 0, 100)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
-                      placeholder="e.g. 80.0"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
-                      Current Semester GPA (0.0 - 10.0)
-                    </label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">Current Semester GPA (0.0 - 10.0)</label>
                     <input
                       type="number"
                       step="0.1"
@@ -269,14 +288,11 @@ export default function PredictPage({ showToast }) {
                       value={formData.current_sem_gpa}
                       onChange={(e) => handleChange('current_sem_gpa', e.target.value, 0, 10)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
-                      placeholder="e.g. 7.5"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
-                      Aggregate CGPA Until Now (0.0 - 10.0)
-                    </label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">Aggregate CGPA Until Now (0.0 - 10.0)</label>
                     <input
                       type="number"
                       step="0.1"
@@ -285,32 +301,149 @@ export default function PredictPage({ showToast }) {
                       value={formData.cgpa}
                       onChange={(e) => handleChange('cgpa', e.target.value, 0, 10)}
                       className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
-                      placeholder="e.g. 7.8"
                     />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">
-                    1st Sem Course Approval Rate ({(formData.first_sem_approval_rate * 100).toFixed(0)}%)
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.05"
-                    value={formData.first_sem_approval_rate}
-                    onChange={(e) => handleChange('first_sem_approval_rate', e.target.value, 0, 1)}
-                    className="w-full accent-indigo-500 cursor-pointer mt-2"
-                  />
+                  <div>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">Number of Courses Enrolled</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={formData.courses_enrolled}
+                      onChange={(e) => handleChange('courses_enrolled', e.target.value, 1, 20)}
+                      className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">Number of Courses Approved/Passed</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="20"
+                      value={formData.courses_approved}
+                      onChange={(e) => handleChange('courses_approved', e.target.value, 0, 20)}
+                      className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs font-medium text-slate-300 mb-1">Number of Courses Failed</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="20"
+                      value={formData.courses_failed}
+                      onChange={(e) => handleChange('courses_failed', e.target.value, 0, 20)}
+                      className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
+                    />
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Step 2: Financial Status */}
+            {/* Step 2: Attendance & Participation */}
             {step === 2 && (
               <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">2. Financial Status Indicators</h3>
+                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">2. Attendance & Academic Participation</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between text-xs font-medium text-slate-300 mb-1">
+                      <span>Class Attendance Rate</span>
+                      <span className="font-bold text-indigo-400">{formData.attendance_pct}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="1"
+                      value={formData.attendance_pct}
+                      onChange={(e) => handleChange('attendance_pct', e.target.value, 0, 100)}
+                      className="w-full accent-indigo-500 cursor-pointer"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-xs font-medium text-slate-300 mb-1">
+                      <span>Evaluation Participation Rate</span>
+                      <span className="font-bold text-indigo-400">{formData.evaluation_participation_pct}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="1"
+                      value={formData.evaluation_participation_pct}
+                      onChange={(e) => handleChange('evaluation_participation_pct', e.target.value, 0, 100)}
+                      className="w-full accent-indigo-500 cursor-pointer"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex justify-between text-xs font-medium text-slate-300 mb-1">
+                      <span>Assignment Submission Rate</span>
+                      <span className="font-bold text-indigo-400">{formData.assignment_submission_pct}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="1"
+                      value={formData.assignment_submission_pct}
+                      onChange={(e) => handleChange('assignment_submission_pct', e.target.value, 0, 100)}
+                      className="w-full accent-indigo-500 cursor-pointer"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Wellbeing Inputs (1-5 Scale) */}
+            {step === 3 && (
+              <div className="space-y-5 animate-fadeIn">
+                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">3. Wellbeing & Psychosocial Factors (1 - 5 Scale)</h3>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {[
+                    { key: 'stress_level', label: 'Stress Level', desc: '1 = Low, 5 = Severe' },
+                    { key: 'anxiety_level', label: 'Anxiety Level', desc: '1 = Low, 5 = Severe' },
+                    { key: 'sleep_quality', label: 'Sleep Quality', desc: '1 = Poor, 5 = Excellent' },
+                    { key: 'motivation_level', label: 'Motivation Level', desc: '1 = Low, 5 = High' },
+                    { key: 'academic_satisfaction', label: 'Academic Satisfaction', desc: '1 = Low, 5 = High' },
+                    { key: 'social_support', label: 'Social Support', desc: '1 = Poor, 5 = Strong' },
+                    { key: 'study_life_balance', label: 'Study-Life Balance', desc: '1 = Poor, 5 = Great' }
+                  ].map((item) => (
+                    <div key={item.key} className="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+                      <div className="flex justify-between items-center mb-1.5">
+                        <div>
+                          <p className="text-xs font-semibold text-white">{item.label}</p>
+                          <p className="text-[10px] text-slate-400">{item.desc}</p>
+                        </div>
+                        <span className="text-xs font-extrabold px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                          {formData[item.key]} / 5
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="1"
+                        max="5"
+                        step="1"
+                        value={formData[item.key]}
+                        onChange={(e) => handleChange(item.key, e.target.value, 1, 5)}
+                        className="w-full accent-indigo-500 cursor-pointer"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Financial & Demographic */}
+            {step === 4 && (
+              <div className="space-y-5 animate-fadeIn">
+                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">4. Financial & Demographic Signals</h3>
                 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-slate-700/60">
@@ -352,7 +485,7 @@ export default function PredictPage({ showToast }) {
                   <div className="flex items-center justify-between p-4 rounded-xl bg-slate-800/60 border border-slate-700/60">
                     <div>
                       <p className="text-sm font-semibold text-white">Scholarship Holder</p>
-                      <p className="text-xs text-slate-400">Is the student receiving a financial scholarship grant?</p>
+                      <p className="text-xs text-slate-400">Is the student receiving a scholarship grant?</p>
                     </div>
                     <button
                       type="button"
@@ -366,123 +499,73 @@ export default function PredictPage({ showToast }) {
                       }`} />
                     </button>
                   </div>
-                </div>
-              </div>
-            )}
 
-            {/* Step 3: Demographics & Mental Wellbeing */}
-            {step === 3 && (
-              <div className="space-y-5 animate-fadeIn">
-                <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-wider">3. Demographics, Mental Health & Lifestyle Signals</h3>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Age at Enrollment (15 - 70)</label>
-                    <input
-                      type="number"
-                      min="15"
-                      max="70"
-                      value={formData.age_at_enrollment}
-                      onChange={(e) => handleChange('age_at_enrollment', e.target.value, 15, 70)}
-                      className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Gender</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, gender: 1 }))}
-                        className={`py-2 rounded-xl text-xs font-semibold border ${
-                          formData.gender === 1 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500' : 'bg-slate-800 text-slate-400 border-slate-700'
-                        }`}
-                      >
-                        Male
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, gender: 0 }))}
-                        className={`py-2 rounded-xl text-xs font-semibold border ${
-                          formData.gender === 0 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500' : 'bg-slate-800 text-slate-400 border-slate-700'
-                        }`}
-                      >
-                        Female
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
-                      Perceived Stress Level (1 - 10)
-                    </label>
-                    <div className="flex items-center gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-300 mb-1">Age at Enrollment</label>
                       <input
-                        type="range"
-                        min="1"
-                        max="10"
-                        value={formData.stress_level}
-                        onChange={(e) => handleChange('stress_level', e.target.value, 1, 10)}
-                        className="w-full accent-rose-500 cursor-pointer"
+                        type="number"
+                        min="15"
+                        max="70"
+                        value={formData.age_at_enrollment}
+                        onChange={(e) => handleChange('age_at_enrollment', e.target.value, 15, 70)}
+                        className="w-full bg-slate-800 text-white text-sm px-3.5 py-2 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
                       />
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${
-                        formData.stress_level >= 7 ? 'bg-rose-500/20 text-rose-300' :
-                        formData.stress_level >= 5 ? 'bg-amber-500/20 text-amber-300' : 'bg-emerald-500/20 text-emerald-300'
-                      }`}>
-                        {formData.stress_level}/10
-                      </span>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
-                      Daily Screen Time (Hours)
-                    </label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      min="0"
-                      max="24"
-                      value={formData.screen_time_hours}
-                      onChange={(e) => handleChange('screen_time_hours', e.target.value, 0, 24)}
-                      className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
-                    />
-                  </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-300 mb-1">Gender</label>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, gender: 1 }))}
+                          className={`py-2 rounded-xl text-xs font-semibold border ${
+                            formData.gender === 1 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500' : 'bg-slate-800 text-slate-400 border-slate-700'
+                          }`}
+                        >
+                          Male
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, gender: 0 }))}
+                          className={`py-2 rounded-xl text-xs font-semibold border ${
+                            formData.gender === 0 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500' : 'bg-slate-800 text-slate-400 border-slate-700'
+                          }`}
+                        >
+                          Female
+                        </button>
+                      </div>
+                    </div>
 
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
-                      Nightly Sleep (Hours)
-                    </label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      min="0"
-                      max="12"
-                      value={formData.sleep_hours}
-                      onChange={(e) => handleChange('sleep_hours', e.target.value, 0, 12)}
-                      className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
-                      Weekly Study Hours
-                    </label>
-                    <input
-                      type="number"
-                      step="1"
-                      min="0"
-                      max="100"
-                      value={formData.study_hours}
-                      onChange={(e) => handleChange('study_hours', e.target.value, 0, 100)}
-                      className="w-full bg-slate-800 text-white text-sm px-3.5 py-2.5 rounded-xl border border-slate-700 focus:border-indigo-500 focus:outline-none"
-                    />
+                    <div>
+                      <label className="block text-xs font-medium text-slate-300 mb-1">Displaced (Living away)</label>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, displaced: 1 }))}
+                          className={`py-2 rounded-xl text-xs font-semibold border ${
+                            formData.displaced === 1 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500' : 'bg-slate-800 text-slate-400 border-slate-700'
+                          }`}
+                        >
+                          Yes
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, displaced: 0 }))}
+                          className={`py-2 rounded-xl text-xs font-semibold border ${
+                            formData.displaced === 0 ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500' : 'bg-slate-800 text-slate-400 border-slate-700'
+                          }`}
+                        >
+                          No
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Stepper Control Buttons */}
+            {/* Controls */}
             <div className="flex items-center justify-between pt-4 border-t border-slate-800">
               {step > 1 ? (
                 <button
@@ -495,7 +578,7 @@ export default function PredictPage({ showToast }) {
                 </button>
               ) : <div />}
 
-              {step < 3 ? (
+              {step < 4 ? (
                 <button
                   type="button"
                   onClick={() => setStep(step + 1)}
@@ -529,7 +612,7 @@ export default function PredictPage({ showToast }) {
 
         </div>
 
-        {/* Right Column: Prediction Results View */}
+        {/* Right Column: Prediction Results View with 0-100 Sub-Risk Cards */}
         <div className="lg:col-span-5 space-y-6">
           
           {!result ? (
@@ -539,13 +622,13 @@ export default function PredictPage({ showToast }) {
               </div>
               <h3 className="text-lg font-bold text-white">Ready for Risk Evaluation</h3>
               <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
-                Complete the 3-step feature form or select a quick profile preset above to generate an immediate student dropout prediction with SHAP explanations.
+                Complete the 4-step feature form or select a quick profile preset above to generate Sub-Risk Scores (Academic, Wellbeing, Financial) & overall ML dropout forecast.
               </p>
             </div>
           ) : (
             <div className="space-y-6 animate-fadeIn">
               
-              {/* Predicted Class Card */}
+              {/* Main Outcome & Overall Dropout Probability */}
               <div className={`p-6 rounded-2xl border backdrop-blur-md relative overflow-hidden ${
                 result.predicted_class === 'Dropout'
                   ? 'bg-rose-950/40 border-rose-500/40'
@@ -554,7 +637,7 @@ export default function PredictPage({ showToast }) {
                   : 'bg-emerald-950/40 border-emerald-500/40'
               }`}>
                 
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Predicted Outcome</span>
                   <span className={`px-3 py-1 rounded-full text-xs font-extrabold flex items-center gap-1.5 ${
                     result.risk_tier === 'High'
@@ -568,30 +651,80 @@ export default function PredictPage({ showToast }) {
                   </span>
                 </div>
 
-                <h2 className={`text-3xl font-extrabold mb-4 ${
-                  result.predicted_class === 'Dropout' ? 'text-rose-400' :
-                  result.predicted_class === 'Enrolled' ? 'text-amber-400' : 'text-emerald-400'
-                }`}>
-                  {result.predicted_class}
-                </h2>
+                <div className="flex items-baseline justify-between mb-4">
+                  <h2 className={`text-3xl font-extrabold ${
+                    result.predicted_class === 'Dropout' ? 'text-rose-400' :
+                    result.predicted_class === 'Enrolled' ? 'text-amber-400' : 'text-emerald-400'
+                  }`}>
+                    {result.predicted_class}
+                  </h2>
+                  <div className="text-right">
+                    <p className="text-[10px] text-slate-400 font-semibold uppercase">Overall Dropout Prob</p>
+                    <p className="text-2xl font-extrabold text-white">{result.overall_dropout_prob_pct}%</p>
+                  </div>
+                </div>
 
-                {/* Probability Distribution Gauge */}
-                <div className="space-y-2 pt-2 border-t border-slate-800/80">
-                  <p className="text-xs font-semibold text-slate-300">Model Probability Distribution:</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 text-center">
-                      <p className="text-[11px] text-slate-400">Dropout</p>
-                      <p className="text-sm font-extrabold text-rose-400">{(result.probabilities.Dropout * 100).toFixed(1)}%</p>
+                {/* Sub-Risk Normalized 0-100 Scores Cards */}
+                <div className="space-y-3 pt-3 border-t border-slate-800/80">
+                  <p className="text-xs font-semibold text-slate-300">Multi-Domain Sub-Risk Breakdown (0 - 100):</p>
+                  
+                  {/* Academic Risk */}
+                  <div className="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-1.5">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-slate-200 flex items-center gap-1.5">
+                        <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
+                        <span>Academic Risk</span>
+                      </span>
+                      <span className="font-extrabold text-indigo-300">{result.academic_risk_score} / 100</span>
                     </div>
-                    <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 text-center">
-                      <p className="text-[11px] text-slate-400">Enrolled</p>
-                      <p className="text-sm font-extrabold text-amber-400">{(result.probabilities.Enrolled * 100).toFixed(1)}%</p>
-                    </div>
-                    <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 text-center">
-                      <p className="text-[11px] text-slate-400">Graduate</p>
-                      <p className="text-sm font-extrabold text-emerald-400">{(result.probabilities.Graduate * 100).toFixed(1)}%</p>
+                    <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all ${
+                          result.academic_risk_score > 60 ? 'bg-rose-500' : result.academic_risk_score > 35 ? 'bg-amber-500' : 'bg-emerald-500'
+                        }`}
+                        style={{ width: `${result.academic_risk_score}%` }}
+                      />
                     </div>
                   </div>
+
+                  {/* Wellbeing Risk */}
+                  <div className="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-1.5">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-slate-200 flex items-center gap-1.5">
+                        <HeartPulse className="w-3.5 h-3.5 text-pink-400" />
+                        <span>Wellbeing Risk</span>
+                      </span>
+                      <span className="font-extrabold text-pink-300">{result.wellbeing_risk_score} / 100</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all ${
+                          result.wellbeing_risk_score > 60 ? 'bg-rose-500' : result.wellbeing_risk_score > 35 ? 'bg-amber-500' : 'bg-emerald-500'
+                        }`}
+                        style={{ width: `${result.wellbeing_risk_score}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Financial Risk */}
+                  <div className="bg-slate-900/90 p-3 rounded-xl border border-slate-800 space-y-1.5">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-slate-200 flex items-center gap-1.5">
+                        <DollarSign className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Financial Risk</span>
+                      </span>
+                      <span className="font-extrabold text-amber-300">{result.financial_risk_score} / 100</span>
+                    </div>
+                    <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full transition-all ${
+                          result.financial_risk_score > 60 ? 'bg-rose-500' : result.financial_risk_score > 35 ? 'bg-amber-500' : 'bg-emerald-500'
+                        }`}
+                        style={{ width: `${result.financial_risk_score}%` }}
+                      />
+                    </div>
+                  </div>
+
                 </div>
               </div>
 
@@ -599,7 +732,7 @@ export default function PredictPage({ showToast }) {
               <div className="bg-slate-900/80 p-6 rounded-2xl border border-slate-800 space-y-4">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-indigo-400" />
-                  <span>Top SHAP Contributing Risk Factors</span>
+                  <span>Top SHAP Contributing Factors</span>
                 </h3>
 
                 <div className="space-y-3">
@@ -623,7 +756,7 @@ export default function PredictPage({ showToast }) {
               <div className="bg-slate-900/80 p-6 rounded-2xl border border-slate-800 space-y-3">
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
                   <UserCheck className="w-4 h-4 text-emerald-400" />
-                  <span>Advisor Next Steps & Wellbeing Interventions</span>
+                  <span>Advisor Next Steps & Interventions</span>
                 </h3>
 
                 <ul className="space-y-2">
